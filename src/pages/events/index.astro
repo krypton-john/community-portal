@@ -1,0 +1,61 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import EventCalendar from '../../components/EventCalendar.astro';
+import { getCollection } from 'astro:content';
+import {
+  eventsOnDate,
+  filterActivePosts,
+  getCalendarDays,
+  getEventPosts,
+  getUpcomingEvents,
+  sortByPublishedDesc,
+} from '../../utils/posts';
+
+const allPosts = (await getCollection('news')).sort(sortByPublishedDesc);
+const activePosts = filterActivePosts(allPosts);
+const eventPosts = getEventPosts(activePosts);
+const upcoming = getUpcomingEvents(activePosts, 30);
+
+const now = new Date();
+const year = now.getFullYear();
+const month = now.getMonth();
+const days = getCalendarDays(year, month);
+
+function dayKey(date: Date): string {
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
+const eventsByDay = new Map<string, typeof eventPosts>();
+for (const day of days) {
+  if (!day) continue;
+  const key = dayKey(day);
+  eventsByDay.set(key, eventsOnDate(eventPosts, day));
+}
+---
+
+<BaseLayout
+  title="Events"
+  description="Local community events calendar and upcoming listings for Riverside."
+>
+  <div class="mx-auto max-w-5xl px-4 py-8">
+    <header class="mb-8">
+      <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">Events calendar</h1>
+      <p class="mt-2 text-slate-600">
+        Community events for the month ahead. Click an event for full details.
+      </p>
+    </header>
+
+    <EventCalendar
+      events={upcoming}
+      year={year}
+      month={month}
+      days={days}
+      eventsByDay={eventsByDay}
+    />
+
+    <p class="mt-8 text-sm text-slate-500">
+      Calendar shows {new Date(year, month, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}.
+      Browse <a href="/news?category=event" class="text-brand-600 hover:underline">all event posts</a> for more.
+    </p>
+  </div>
+</BaseLayout>

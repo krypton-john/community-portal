@@ -1,0 +1,145 @@
+---
+import '../styles/global.css';
+import { siteConfig } from '../config';
+
+interface Props {
+  title?: string;
+  description?: string;
+  ogType?: string;
+}
+
+const {
+  title,
+  description = siteConfig.description,
+  ogType = 'website',
+} = Astro.props;
+
+const pageTitle = title ? `${title} | ${siteConfig.name}` : siteConfig.name;
+const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).href;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} RSS`} href="/feed.xml" />
+    <link rel="alternate" type="application/rss+xml" title={`${siteConfig.name} Alerts RSS`} href="/feed/alerts.xml" />
+    <link rel="canonical" href={canonicalUrl} />
+
+    <meta property="og:title" content={pageTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:site_name" content={siteConfig.name} />
+
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content={pageTitle} />
+    <meta name="twitter:description" content={description} />
+
+    <title>{pageTitle}</title>
+  </head>
+  <body class="min-h-screen flex flex-col">
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:shadow-lg"
+    >
+      Skip to main content
+    </a>
+
+    <header class="border-b border-slate-200 bg-white shadow-sm">
+      <div class="mx-auto flex max-w-5xl flex-wrap items-center justify-between gap-4 px-4 py-4">
+        <a href="/" class="group">
+          <p class="text-lg font-bold text-brand-700 group-hover:text-brand-600">
+            {siteConfig.name}
+          </p>
+          <p class="text-sm text-slate-500">{siteConfig.tagline}</p>
+        </a>
+        <nav aria-label="Main navigation" class="flex flex-wrap gap-1 sm:gap-2">
+          <a
+            href="/"
+            class:list={[
+              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              Astro.url.pathname === '/'
+                ? 'bg-brand-50 text-brand-700'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+            ]}
+          >
+            Home
+          </a>
+          <a
+            href="/news"
+            class:list={[
+              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              Astro.url.pathname.startsWith('/news')
+                ? 'bg-brand-50 text-brand-700'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+            ]}
+          >
+            News
+          </a>
+          <a
+            href="/events"
+            class:list={[
+              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              Astro.url.pathname.startsWith('/events')
+                ? 'bg-brand-50 text-brand-700'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+            ]}
+          >
+            Events
+          </a>
+          <a
+            href="/about"
+            class:list={[
+              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              Astro.url.pathname === '/about'
+                ? 'bg-brand-50 text-brand-700'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+            ]}
+          >
+            About
+          </a>
+          <a
+            href="/feed.xml"
+            class="rounded-md px-3 py-2 text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900"
+          >
+            RSS
+          </a>
+        </nav>
+      </div>
+    </header>
+
+    <main id="main-content" class="flex-1">
+      <slot />
+    </main>
+
+    <footer class="border-t border-slate-200 bg-white">
+      <div class="mx-auto max-w-5xl px-4 py-8 text-sm text-slate-500">
+        <p class="font-medium text-slate-700">{siteConfig.name}</p>
+        <p class="mt-1">Serving {siteConfig.town} residents with verified local updates.</p>
+        <p class="mt-3">
+          <a href="/feed.xml" class="text-brand-600 hover:underline">Subscribe via RSS</a>
+          ·
+          <a href="/about" class="text-brand-600 hover:underline">About &amp; submit tips</a>
+        </p>
+      </div>
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+</style>

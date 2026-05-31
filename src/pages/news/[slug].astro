@@ -1,0 +1,123 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+import {
+  categoryColor,
+  categoryLabel,
+  formatDateTime,
+  getSlug,
+  getUpdatedAt,
+  isExpired,
+} from '../../utils/posts';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('news');
+  return posts.map((post) => ({
+    params: { slug: getSlug(post) },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const slug = getSlug(post);
+const expired = isExpired(post);
+const description = `${post.data.source}: ${post.data.title}`;
+---
+
+<BaseLayout title={post.data.title} description={description} ogType="article">
+  <article class="mx-auto max-w-3xl px-4 py-8">
+    {expired && (
+      <div class="mb-6 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900" role="status">
+        This notice has ended. Information is kept for reference.
+      </div>
+    )}
+
+    <header class="mb-8 border-b border-slate-200 pb-6">
+      <div class="mb-3 flex flex-wrap gap-2">
+        <span class={`rounded-full px-2.5 py-0.5 text-xs font-medium ${categoryColor(post.data.category)}`}>
+          {categoryLabel(post.data.category)}
+        </span>
+        {post.data.verified && (
+          <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
+            Verified
+          </span>
+        )}
+        {post.data.urgent && !expired && (
+          <span class="rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-medium text-white">
+            Urgent
+          </span>
+        )}
+      </div>
+
+      <h1 class="text-2xl font-bold text-slate-900 sm:text-4xl">{post.data.title}</h1>
+
+      <dl class="mt-4 grid gap-2 text-sm text-slate-600 sm:grid-cols-2">
+        <div>
+          <dt class="font-medium text-slate-500">Source</dt>
+          <dd>
+            {post.data.sourceUrl ? (
+              <a href={post.data.sourceUrl} class="text-brand-600 hover:underline" rel="noopener noreferrer" target="_blank">
+                {post.data.source}
+              </a>
+            ) : (
+              post.data.source
+            )}
+          </dd>
+        </div>
+        <div>
+          <dt class="font-medium text-slate-500">Published</dt>
+          <dd>{formatDateTime(post.data.publishedAt)}</dd>
+        </div>
+        {getUpdatedAt(post).getTime() !== post.data.publishedAt.getTime() && (
+          <div>
+            <dt class="font-medium text-slate-500">Last updated</dt>
+            <dd>{formatDateTime(getUpdatedAt(post))}</dd>
+          </div>
+        )}
+        {post.data.location && (
+          <div>
+            <dt class="font-medium text-slate-500">Location</dt>
+            <dd>{post.data.location}</dd>
+          </div>
+        )}
+        {post.data.eventStart && (
+          <div>
+            <dt class="font-medium text-slate-500">Event start</dt>
+            <dd>{formatDateTime(post.data.eventStart)}</dd>
+          </div>
+        )}
+        {post.data.eventEnd && (
+          <div>
+            <dt class="font-medium text-slate-500">Event end</dt>
+            <dd>{formatDateTime(post.data.eventEnd)}</dd>
+          </div>
+        )}
+        {post.data.expiresAt && (
+          <div>
+            <dt class="font-medium text-slate-500">Expires</dt>
+            <dd>{formatDateTime(post.data.expiresAt)}</dd>
+          </div>
+        )}
+      </dl>
+
+      {post.data.tags.length > 0 && (
+        <ul class="mt-4 flex flex-wrap gap-2" aria-label="Tags">
+          {post.data.tags.map((tag) => (
+            <li class="rounded-md bg-slate-100 px-2 py-1 text-xs text-slate-600">#{tag}</li>
+          ))}
+        </ul>
+      )}
+    </header>
+
+    <div class="prose-content">
+      <Content />
+    </div>
+
+    <footer class="mt-10 border-t border-slate-200 pt-6">
+      <a href="/news" class="text-sm font-medium text-brand-600 hover:underline">
+        ← Back to all news
+      </a>
+    </footer>
+  </article>
+</BaseLayout>

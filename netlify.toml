@@ -1,0 +1,20 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# Optional: set COUNCIL_RSS_URL in Netlify UI → Site settings → Environment variables
+# Then prepend ingest to build command:
+# command = "npm run ingest:rss && npm run build"
+
+[[headers]]
+  for = "/feed.xml"
+  [headers.values]
+    Content-Type = "application/rss+xml; charset=utf-8"
+
+[[headers]]
+  for = "/feed/alerts.xml"
+  [headers.values]
+    Content-Type = "application/rss+xml; charset=utf-8"

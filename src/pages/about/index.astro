@@ -1,0 +1,50 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { siteConfig } from '../../config';
+---
+
+<BaseLayout title="About" description="About the Riverside Community Portal and how to submit news tips.">
+  <div class="mx-auto max-w-3xl px-4 py-8">
+    <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">About this portal</h1>
+
+    <div class="prose-content mt-6">
+      <p>
+        {siteConfig.name} is a community-run news hub for {siteConfig.town} residents. It brings
+        together verified council notices, traffic updates, local events, and community
+        announcements in one place — so you do not have to scroll through group chat to stay
+        informed.
+      </p>
+
+      <h2>What counts as verified?</h2>
+      <p>
+        Posts marked <strong>Verified</strong> come from official sources (town council, police,
+        schools) or have been checked by a community editor. Unverified tips are reviewed before
+        publication.
+      </p>
+
+      <h2>Submit a news tip</h2>
+      <p>
+        Phase 1 does not include public submissions on-site. If you have a local news tip, event,
+        or urgent alert, email our editors at{' '}
+        <a href={`mailto:${siteConfig.tipEmail}`}>{siteConfig.tipEmail}</a>.
+      </p>
+      <p>
+        Please include: what happened, when, where, and any official source links if available.
+        Editors will verify before publishing.
+      </p>
+
+      <h2>Subscribe to updates</h2>
+      <p>
+        Follow the site via <a href="/feed.xml">RSS feed</a> or{' '}
+        <a href="/feed/alerts.xml">alerts-only feed</a> for urgent and council notices.
+      </p>
+
+      <h2>Coming soon</h2>
+      <ul>
+        <li>Local services &amp; trades directory</li>
+        <li>Community sharing and borrowing hub</li>
+        <li>Admin portal and live traffic feeds</li>
+      </ul>
+    </div>
+  </div>
+</BaseLayout>

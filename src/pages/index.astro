@@ -1,0 +1,110 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
+import UrgentBanner from '../components/UrgentBanner.astro';
+import { getCollection } from 'astro:content';
+import { categories, siteConfig } from '../config';
+import {
+  filterActivePosts,
+  filterVerified,
+  isUrgentActive,
+  sortByPublishedDesc,
+} from '../utils/posts';
+
+const allPosts = (await getCollection('news')).sort(sortByPublishedDesc);
+const activePosts = filterActivePosts(allPosts);
+const urgentPosts = activePosts.filter((post) => isUrgentActive(post));
+const verifiedLatest = filterVerified(activePosts, true).slice(0, 10);
+
+const grouped = categories
+  .map((cat) => ({
+    ...cat,
+    posts: filterVerified(
+      activePosts.filter((p) => p.data.category === cat.id),
+      true,
+    ).slice(0, 3),
+  }))
+  .filter((group) => group.posts.length > 0);
+---
+
+<BaseLayout>
+  <div class="mx-auto max-w-5xl px-4 py-8">
+    {urgentPosts.length > 0 && (
+      <section class="mb-8" aria-label="Urgent alerts">
+        <UrgentBanner posts={urgentPosts} />
+      </section>
+    )}
+
+    <section class="mb-10">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">
+            Welcome to {siteConfig.town}
+          </h1>
+          <p class="mt-2 max-w-2xl text-slate-600">
+            Verified local news, council notices, traffic updates, and community events — without
+            scrolling through group chat.
+          </p>
+        </div>
+        <div class="flex gap-2">
+          <a
+            href="/news"
+            class="rounded-md bg-brand-600 px-4 py-2 text-sm font-medium text-white hover:bg-brand-700"
+          >
+            All news
+          </a>
+          <a
+            href="/events"
+            class="rounded-md border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          >
+            Events calendar
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section class="mb-10" aria-label="Latest verified news">
+      <h2 class="mb-4 text-xl font-semibold text-slate-900">Latest verified updates</h2>
+      {verifiedLatest.length === 0 ? (
+        <p class="text-slate-600">No verified updates at the moment. Check back soon.</p>
+      ) : (
+        <div class="grid gap-4 sm:grid-cols-2">
+          {verifiedLatest.map((post) => (
+            <PostCard post={post} />
+          ))}
+        </div>
+      )}
+      <p class="mt-4">
+        <a href="/news?verified=all" class="text-sm font-medium text-brand-600 hover:underline">
+          Show all community posts →
+        </a>
+      </p>
+    </section>
+
+    {grouped.length > 0 && (
+      <section aria-label="News by category">
+        <h2 class="mb-6 text-xl font-semibold text-slate-900">By category</h2>
+        <div class="space-y-8">
+          {grouped.map((group) => (
+            <div>
+              <div class="mb-3 flex items-center justify-between">
+                <h3 class="text-lg font-semibold text-slate-800">{group.label}</h3>
+                <a
+                  href={`/news?category=${group.id}`}
+                  class="text-sm font-medium text-brand-600 hover:underline"
+                >
+                  View all
+                </a>
+              </div>
+              <div class="grid gap-3 sm:grid-cols-3">
+                {group.posts.map((post) => (
+                  <PostCard post={post} compact />
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+  </div>
+</BaseLayout>

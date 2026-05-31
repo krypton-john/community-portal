@@ -1,0 +1,32 @@
+---
+import type { NewsPost } from '../utils/posts';
+import { formatDateTime, getSlug } from '../utils/posts';
+
+interface Props {
+  posts: NewsPost[];
+}
+
+const { posts } = Astro.props;
+---
+
+{posts.length > 0 ? (
+  <div class="space-y-3" role="list">
+    {posts.map((post) => {
+      const slug = getSlug(post);
+      return (
+        <div role="listitem" class="rounded-lg border border-red-200 bg-red-50 p-4">
+          <p class="text-xs font-semibold uppercase tracking-wide text-red-700">Urgent alert</p>
+          <a
+            href={`/news/${slug}`}
+            class="mt-1 block text-lg font-semibold text-red-900 hover:underline"
+          >
+            {post.data.title}
+          </a>
+          <p class="mt-1 text-sm text-red-800">
+            {post.data.source} · {formatDateTime(post.data.publishedAt)}
+          </p>
+        </div>
+      );
+    })}
+  </div>
+) : null}
