@@ -81,3 +81,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add posts, frontmatter rules, 
 - **Phase 2** — API + admin UI
 - **Phase 3** — Local services & trades directory
 - **Phase 4** — Community sharing / borrowing hub
+# community-portal
