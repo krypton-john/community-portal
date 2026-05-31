@@ -2,6 +2,7 @@ name: Example Business Name
 category: other
 address: Main Street, Monasterevin, Co. Kildare
 phone: "045 525 000"
+email: contact@example.com
 website: https://example.com
 social:
   facebook: ""

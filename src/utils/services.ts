@@ -23,6 +23,7 @@ export function filterBySearch(listings: ServiceListing[], query: string): Servi
       item.data.name,
       item.data.address,
       item.data.phone ?? '',
+      item.data.email ?? '',
       item.data.description ?? '',
       item.data.category,
     ]
@@ -58,6 +59,7 @@ export function serializeListingsForClient(listings: ServiceListing[]) {
     categoryLabel: serviceCategoryLabel(item.data.category),
     address: item.data.address,
     phone: item.data.phone ?? '',
+    email: item.data.email ?? '',
     website: item.data.website ?? '',
     social: item.data.social ?? {},
     verified: item.data.verified,

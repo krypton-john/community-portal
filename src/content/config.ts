@@ -56,6 +56,7 @@ const serviceSchema = z.object({
   category: serviceCategoryEnum,
   address: z.string(),
   phone: z.string().optional(),
+  email: z.union([z.string().email(), z.literal('')]).optional(),
   website: z.union([z.string().url(), z.literal('')]).optional(),
   social: socialSchema,
   verified: z.boolean().default(false),

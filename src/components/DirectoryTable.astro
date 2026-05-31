@@ -9,6 +9,7 @@ interface Props {
     categoryLabel: string;
     address: string;
     phone: string;
+    email: string;
     website: string;
     social: {
       facebook?: string;
@@ -64,6 +65,7 @@ const { listings } = Astro.props;
           <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Category</th>
           <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Address</th>
           <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Phone</th>
+          <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Email</th>
           <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Website</th>
           <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Social</th>
         </tr>
@@ -75,7 +77,7 @@ const { listings } = Astro.props;
               class="directory-row hover:bg-slate-50"
               data-id={item.id}
               data-category={item.category}
-              data-search={`${item.name} ${item.categoryLabel} ${item.address} ${item.phone} ${item.description}`.toLowerCase()}
+              data-search={`${item.name} ${item.categoryLabel} ${item.address} ${item.phone} ${item.email} ${item.description}`.toLowerCase()}
             >
               <td class="px-4 py-3 font-medium text-slate-900">
                 {item.name}
@@ -91,6 +93,15 @@ const { listings } = Astro.props;
                 {item.phone ? (
                   <a href={`tel:${item.phone.replace(/\s/g, '')}`} class="text-brand-600 hover:underline">
                     {item.phone}
+                  </a>
+                ) : (
+                  <span class="text-slate-400">—</span>
+                )}
+              </td>
+              <td class="px-4 py-3">
+                {item.email ? (
+                  <a href={`mailto:${item.email}`} class="text-brand-600 hover:underline">
+                    {item.email}
                   </a>
                 ) : (
                   <span class="text-slate-400">—</span>
