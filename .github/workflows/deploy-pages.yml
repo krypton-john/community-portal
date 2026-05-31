@@ -1,15 +1,18 @@
-name: Scheduled build with RSS ingest
+name: Deploy to GitHub Pages
 
 on:
-  schedule:
-    # Every hour — adjust to 15–60 min as needed
-    - cron: '0 * * * *'
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
   pages: write
   id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
 
 jobs:
   build:
@@ -23,17 +26,9 @@ jobs:
           cache: npm
 
       - run: npm ci
+      - run: npm run build
 
-      - name: Ingest council RSS
-        env:
-          COUNCIL_RSS_URL: ${{ secrets.COUNCIL_RSS_URL }}
-        run: npm run ingest:rss
-
-      - name: Build site
-        run: npm run build
-
-      - name: Deploy to GitHub Pages
-        uses: actions/upload-pages-artifact@v3
+      - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
 

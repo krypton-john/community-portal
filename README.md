@@ -53,6 +53,20 @@ Schedule this on your host (see deploy configs below) to refresh ingested notice
 
 ## Deploy
 
+### GitHub Pages
+
+This project deploys via GitHub Actions (not Jekyll). In repo **Settings → Pages**, set **Source** to **GitHub Actions**.
+
+Live URL: `https://krypton-john.github.io/community-portal/`
+
+Local preview with the same base path:
+
+```bash
+npm run build
+npm run preview
+# open http://localhost:4321/community-portal/
+```
+
 ### Netlify
 
 [`netlify.toml`](netlify.toml) is included. Connect your repo and deploy:

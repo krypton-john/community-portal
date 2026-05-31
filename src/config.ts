@@ -4,7 +4,7 @@ export const siteConfig = {
   town: 'Riverside',
   description:
     'Verified community news, council notices, traffic updates, and local events for Riverside residents.',
-  url: 'https://community-portal.example.com',
+  url: 'https://krypton-john.github.io/community-portal',
   tipEmail: 'news@riverside-community.example',
   councilRssUrl: import.meta.env.COUNCIL_RSS_URL ?? '',
 };
