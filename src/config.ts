@@ -18,3 +18,20 @@ export const categories = [
 ] as const;
 
 export type Category = (typeof categories)[number]['id'];
+
+export const serviceCategories = [
+  { id: 'plumber', label: 'Plumber' },
+  { id: 'electrician', label: 'Electrician' },
+  { id: 'builder', label: 'Builder' },
+  { id: 'gardener', label: 'Gardener' },
+  { id: 'mechanic', label: 'Mechanic' },
+  { id: 'childcare', label: 'Childcare' },
+  { id: 'cleaner', label: 'Cleaner' },
+  { id: 'painter', label: 'Painter' },
+  { id: 'roofer', label: 'Roofer' },
+  { id: 'cafe', label: 'Café & Food' },
+  { id: 'shop', label: 'Shop' },
+  { id: 'other', label: 'Other' },
+] as const;
+
+export type ServiceCategory = (typeof serviceCategories)[number]['id'];

@@ -7,6 +7,7 @@ Phase 1: a static community news and alerts hub for Monasterevin residents. Veri
 - **Home** — Urgent banner + latest verified updates by category
 - **News feed** — Filterable by category; toggle verified-only vs all community posts
 - **Events calendar** — Month view + upcoming list (30 days)
+- **Local directory** — Searchable trades & business listings at `/services`
 - **About** — How to submit tips and what "verified" means
 
 ## Local development
@@ -78,5 +79,5 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add posts, frontmatter rules, 
 ## Roadmap
 
 - **Phase 2** — API + admin UI
-- **Phase 3** — Local services & trades directory
+- **Phase 3** — Expand directory (reviews, availability, provider login)
 - **Phase 4** — Community sharing / borrowing hub

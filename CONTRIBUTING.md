@@ -52,6 +52,26 @@ npm run dev
 - **business** — Openings, closures, local business news
 - **community** — General community updates
 
+## Local directory listings
+
+Business and trades listings live in `src/content/services/` as YAML files.
+
+1. Copy [`templates/service-template.yaml`](templates/service-template.yaml) to `src/content/services/your-business.yaml`
+2. Fill in name, category, address, phone, website, and social links
+3. Set `verified: true` only after an editor has confirmed the details
+4. Merge to `main` to publish
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `name` | Yes | Business or tradesperson name |
+| `category` | Yes | e.g. `plumber`, `electrician`, `mechanic`, `cafe`, `shop` (see template) |
+| `address` | Yes | Full address |
+| `phone` | No | Contact number |
+| `website` | No | Business website URL |
+| `social` | No | `facebook`, `instagram`, `twitter`, `linkedin` URLs |
+| `verified` | No | Editor-approved listing |
+| `description` | No | Short note on services offered |
+
 ## Deploy workflow
 
 1. Editor reviews PR

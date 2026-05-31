@@ -1,0 +1,10 @@
+name: Canal Café
+category: cafe
+address: Canal Harbour, Monasterevin, Co. Kildare
+phone: "045 525 321"
+website: https://example.com/canal-cafe
+social:
+  instagram: https://instagram.com/example
+  facebook: https://facebook.com/example
+verified: true
+description: Coffee, lunch, and canal-side seating.

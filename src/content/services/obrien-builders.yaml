@@ -1,0 +1,10 @@
+name: O'Brien Builders
+category: builder
+address: Ballynafagh Road, Monasterevin, Co. Kildare
+phone: "087 345 6789"
+website: https://example.com/obrien-builders
+social:
+  facebook: https://facebook.com/example
+  linkedin: https://linkedin.com/company/example
+verified: true
+description: Extensions, renovations, and general building work.

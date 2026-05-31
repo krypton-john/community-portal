@@ -1,0 +1,12 @@
+name: Example Business Name
+category: other
+address: Main Street, Monasterevin, Co. Kildare
+phone: "045 525 000"
+website: https://example.com
+social:
+  facebook: ""
+  instagram: ""
+  twitter: ""
+  linkedin: ""
+verified: false
+description: Short description of services offered.

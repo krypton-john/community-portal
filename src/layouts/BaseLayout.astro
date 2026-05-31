@@ -90,6 +90,17 @@ const canonicalUrl = new URL(Astro.url.pathname, siteConfig.url).href;
             Events
           </a>
           <a
+            href="/services"
+            class:list={[
+              'rounded-md px-3 py-2 text-sm font-medium transition-colors',
+              Astro.url.pathname.startsWith('/services')
+                ? 'bg-brand-50 text-brand-700'
+                : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900',
+            ]}
+          >
+            Directory
+          </a>
+          <a
             href="/about"
             class:list={[
               'rounded-md px-3 py-2 text-sm font-medium transition-colors',

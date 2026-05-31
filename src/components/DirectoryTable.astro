@@ -1,0 +1,206 @@
+---
+import { serviceCategories } from '../config';
+
+interface Props {
+  listings: {
+    id: string;
+    name: string;
+    category: string;
+    categoryLabel: string;
+    address: string;
+    phone: string;
+    website: string;
+    social: {
+      facebook?: string;
+      instagram?: string;
+      twitter?: string;
+      linkedin?: string;
+    };
+    verified: boolean;
+    description: string;
+  }[];
+}
+
+const { listings } = Astro.props;
+---
+
+<section aria-label="Local directory search">
+  <div class="mb-6 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <div class="flex-1">
+      <label for="directory-search" class="mb-1 block text-sm font-medium text-slate-700">
+        Search
+      </label>
+      <input
+        type="search"
+        id="directory-search"
+        placeholder="Search by name, trade, or address…"
+        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+        autocomplete="off"
+      />
+    </div>
+    <div class="sm:w-52">
+      <label for="directory-category" class="mb-1 block text-sm font-medium text-slate-700">
+        Category
+      </label>
+      <select
+        id="directory-category"
+        class="w-full rounded-lg border border-slate-300 bg-white px-4 py-2.5 text-sm text-slate-900 shadow-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
+      >
+        <option value="">All categories</option>
+        {serviceCategories.map((cat) => (
+          <option value={cat.id}>{cat.label}</option>
+        ))}
+      </select>
+    </div>
+  </div>
+
+  <p id="directory-count" class="mb-4 text-sm text-slate-600"></p>
+
+  <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white shadow-sm">
+    <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+      <thead class="bg-slate-50">
+        <tr>
+          <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Name</th>
+          <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Category</th>
+          <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Address</th>
+          <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Phone</th>
+          <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Website</th>
+          <th scope="col" class="px-4 py-3 font-semibold text-slate-700">Social</th>
+        </tr>
+      </thead>
+      <tbody id="directory-body" class="divide-y divide-slate-100">
+        {
+          listings.map((item) => (
+            <tr
+              class="directory-row hover:bg-slate-50"
+              data-id={item.id}
+              data-category={item.category}
+              data-search={`${item.name} ${item.categoryLabel} ${item.address} ${item.phone} ${item.description}`.toLowerCase()}
+            >
+              <td class="px-4 py-3 font-medium text-slate-900">
+                {item.name}
+                {item.verified && (
+                  <span class="ml-2 inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-medium text-emerald-800">
+                    Verified
+                  </span>
+                )}
+              </td>
+              <td class="px-4 py-3 text-slate-600">{item.categoryLabel}</td>
+              <td class="px-4 py-3 text-slate-600">{item.address}</td>
+              <td class="px-4 py-3 text-slate-600">
+                {item.phone ? (
+                  <a href={`tel:${item.phone.replace(/\s/g, '')}`} class="text-brand-600 hover:underline">
+                    {item.phone}
+                  </a>
+                ) : (
+                  <span class="text-slate-400">—</span>
+                )}
+              </td>
+              <td class="px-4 py-3">
+                {item.website ? (
+                  <a
+                    href={item.website}
+                    class="text-brand-600 hover:underline"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Website
+                  </a>
+                ) : (
+                  <span class="text-slate-400">—</span>
+                )}
+              </td>
+              <td class="px-4 py-3">
+                <div class="flex flex-wrap gap-2">
+                  {item.social.facebook && (
+                    <a
+                      href={item.social.facebook}
+                      class="text-brand-600 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Facebook
+                    </a>
+                  )}
+                  {item.social.instagram && (
+                    <a
+                      href={item.social.instagram}
+                      class="text-brand-600 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      Instagram
+                    </a>
+                  )}
+                  {item.social.twitter && (
+                    <a
+                      href={item.social.twitter}
+                      class="text-brand-600 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      X
+                    </a>
+                  )}
+                  {item.social.linkedin && (
+                    <a
+                      href={item.social.linkedin}
+                      class="text-brand-600 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      LinkedIn
+                    </a>
+                  )}
+                  {!item.social.facebook &&
+                    !item.social.instagram &&
+                    !item.social.twitter &&
+                    !item.social.linkedin && <span class="text-slate-400">—</span>}
+                </div>
+              </td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+
+  <p id="directory-empty" class="mt-4 hidden rounded-lg border border-slate-200 bg-white p-8 text-center text-slate-600">
+    No listings match your search. Try a different name or category.
+  </p>
+</section>
+
+<script>
+  function filterDirectory() {
+    const searchInput = document.getElementById('directory-search');
+    const categorySelect = document.getElementById('directory-category');
+    const countEl = document.getElementById('directory-count');
+    const emptyEl = document.getElementById('directory-empty');
+    const rows = document.querySelectorAll('.directory-row');
+
+    if (!searchInput || !categorySelect || !countEl || !emptyEl) return;
+
+    const query = searchInput.value.trim().toLowerCase();
+    const category = categorySelect.value;
+    let visible = 0;
+
+    rows.forEach((row) => {
+      const el = row as HTMLElement;
+      const matchesSearch = !query || (el.dataset.search ?? '').includes(query);
+      const matchesCategory = !category || el.dataset.category === category;
+      const show = matchesSearch && matchesCategory;
+      el.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+
+    countEl.textContent = `${visible} listing${visible === 1 ? '' : 's'}`;
+    emptyEl.classList.toggle('hidden', visible > 0);
+  }
+
+  const searchInput = document.getElementById('directory-search');
+  const categorySelect = document.getElementById('directory-category');
+
+  searchInput?.addEventListener('input', filterDirectory);
+  categorySelect?.addEventListener('change', filterDirectory);
+  filterDirectory();
+</script>
