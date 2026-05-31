@@ -1,11 +1,11 @@
 export const siteConfig = {
-  name: 'Riverside Community Portal',
-  tagline: 'Your single source for local news, alerts, and events',
-  town: 'Riverside',
+  name: 'Monasterevin Community Portal',
+  tagline: 'Local news, alerts, and events for Monasterevin',
+  town: 'Monasterevin',
   description:
-    'Verified community news, council notices, traffic updates, and local events for Riverside residents.',
+    'Verified community news, council notices, traffic updates, and local events for Monasterevin residents.',
   url: 'https://krypton-john.github.io/community-portal',
-  tipEmail: 'news@riverside-community.example',
+  tipEmail: 'tips@monasterevin-community.ie',
   councilRssUrl: import.meta.env.COUNCIL_RSS_URL ?? '',
 };
 

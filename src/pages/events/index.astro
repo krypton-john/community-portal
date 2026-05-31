@@ -2,6 +2,7 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import EventCalendar from '../../components/EventCalendar.astro';
 import { getCollection } from 'astro:content';
+import { siteConfig } from '../../config';
 import {
   eventsOnDate,
   filterActivePosts,
@@ -35,7 +36,7 @@ for (const day of days) {
 
 <BaseLayout
   title="Events"
-  description="Local community events calendar and upcoming listings for Riverside."
+  description={`Local community events calendar and upcoming listings for ${siteConfig.town}.`}
 >
   <div class="mx-auto max-w-5xl px-4 py-8">
     <header class="mb-8">

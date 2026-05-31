@@ -17,7 +17,7 @@ export async function GET(context: { site: string | undefined }) {
 
   return rss({
     title: `${siteConfig.name} — Alerts & Council`,
-    description: 'Urgent alerts and official council notices for Riverside.',
+    description: `Urgent alerts and official council notices for ${siteConfig.town}.`,
     site: context.site ?? siteConfig.url,
     items: posts.map((post) => ({
       title: post.data.title,

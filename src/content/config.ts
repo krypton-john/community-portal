@@ -24,7 +24,7 @@ const newsSchema = z.object({
   eventEnd: z.coerce.date().optional(),
   location: z.string().optional(),
   tags: z.array(z.string()).default([]),
-  community: z.string().default('riverside'),
+  community: z.string().default('monasterevin'),
 });
 
 export const collections = {

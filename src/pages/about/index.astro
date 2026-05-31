@@ -3,7 +3,7 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { siteConfig } from '../../config';
 ---
 
-<BaseLayout title="About" description="About the Riverside Community Portal and how to submit news tips.">
+<BaseLayout title="About" description={`About the ${siteConfig.name} and how to submit news tips.`}>
   <div class="mx-auto max-w-3xl px-4 py-8">
     <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">About this portal</h1>
 
@@ -17,9 +17,9 @@ import { siteConfig } from '../../config';
 
       <h2>What counts as verified?</h2>
       <p>
-        Posts marked <strong>Verified</strong> come from official sources (town council, police,
-        schools) or have been checked by a community editor. Unverified tips are reviewed before
-        publication.
+        Posts marked <strong>Verified</strong> come from official sources (Kildare County Council,
+        Gardaí, schools, Irish Water) or have been checked by a community editor. Unverified tips
+        are reviewed before publication.
       </p>
 
       <h2>Submit a news tip</h2>

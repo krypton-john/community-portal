@@ -69,10 +69,10 @@ publishedAt: ${pubDate.toISOString()}
 category: council
 urgent: false
 verified: true
-source: "Riverside Town Council (RSS)"
+source: "Kildare County Council (RSS)"
 sourceUrl: ${JSON.stringify(item.link || '')}
 tags: ["ingested", "council"]
-community: riverside
+community: monasterevin
 ---
 
 ${item.description || 'See the official source for full details.'}

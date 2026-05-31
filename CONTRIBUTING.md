@@ -27,13 +27,13 @@ npm run dev
 | `category` | Yes | One of: `alert`, `council`, `traffic`, `event`, `business`, `community` |
 | `urgent` | No | `true` pins to home banner for 48 hours (if not expired) |
 | `verified` | No | `true` only for official or editor-approved posts |
-| `source` | Yes | Attribution, e.g. "Riverside Town Council" |
+| `source` | Yes | Attribution, e.g. "Kildare County Council" or "Irish Water" |
 | `sourceUrl` | No | Link to official page |
 | `expiresAt` | No | Post hidden from lists after this time (detail page shows "ended") |
 | `eventStart` / `eventEnd` | For events | ISO datetimes for calendar |
 | `location` | No | Human-readable place |
 | `tags` | No | Array of strings |
-| `community` | No | Defaults to `riverside` |
+| `community` | No | Defaults to `monasterevin` |
 
 ## Verification rules
 
@@ -61,7 +61,7 @@ npm run ingest:rss
 npm run build
 ```
 
-Ingested files go to `src/content/news/ingested/` and are marked `verified: true` with source "Riverside Town Council (RSS)". Schedule rebuilds every 15–60 minutes on your host for freshness.
+Ingested files go to `src/content/news/ingested/` and are marked `verified: true` with source "Kildare County Council (RSS)". Schedule rebuilds every 15–60 minutes on your host for freshness.
 
 ## Deploy workflow
 

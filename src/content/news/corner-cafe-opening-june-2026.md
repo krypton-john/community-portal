@@ -1,17 +1,17 @@
 ---
-title: "The Corner Café opens on Market Square"
-permalink: "corner-cafe-opening-june-2026"
+title: "New café opens on Main Street"
+permalink: "main-street-cafe-opening-june-2026"
 publishedAt: 2026-05-29T08:00:00Z
 category: business
 urgent: false
 verified: false
 source: "Community tip — editor verified"
-location: "Market Square, Riverside"
+location: "Main Street, Monasterevin"
 tags: ["café", "opening", "business"]
-community: riverside
+community: monasterevin
 ---
 
-The Corner Café is opening on **Saturday 7 June** at 8 Market Square, in the former bookshop unit.
+A new café is opening on **Saturday 7 June** on Main Street, Monasterevin.
 
 ## Opening offer
 

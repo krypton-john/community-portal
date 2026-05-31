@@ -5,19 +5,19 @@ publishedAt: 2026-05-28T10:00:00Z
 category: council
 urgent: false
 verified: true
-source: "Riverside Town Council"
-sourceUrl: "https://example.com/council/annual-meeting"
-location: "Riverside Community Hall"
+source: "Monasterevin Town Team"
+sourceUrl: "https://www.kildare.ie"
+location: "Monasterevin Community Centre"
 tags: ["council", "meeting"]
-community: riverside
+community: monasterevin
 ---
 
-The annual town meeting will be held on **Thursday 12 June at 19:00** at Riverside Community Hall.
+The annual town meeting will be held on **Thursday 12 June at 19:00** at Monasterevin Community Centre.
 
 ## Agenda highlights
 
-- Presentation of the draft budget for 2026–27
-- Parks and recreation improvement plan
-- Q&A with councillors and town clerk
+- Presentation of local improvement priorities for 2026
+- Updates on canal-side and town-centre projects
+- Q&A with community representatives and Kildare County Council officials
 
-All residents are welcome. No registration required. The meeting will also be streamed on the council website.
+All residents are welcome. No registration required.

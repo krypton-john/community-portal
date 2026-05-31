@@ -13,7 +13,7 @@ eventStart:
 eventEnd:
 location: ""
 tags: []
-community: riverside
+community: monasterevin
 ---
 
 Write the post body in Markdown below this frontmatter block.

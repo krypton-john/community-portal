@@ -1,6 +1,6 @@
-# Riverside Community Portal
+# Monasterevin Community Portal
 
-Phase 1: a static community news and alerts hub for Riverside residents. Verified council notices, traffic updates, events, and local announcements in one place.
+Phase 1: a static community news and alerts hub for Monasterevin residents. Verified council notices, traffic updates, events, and local announcements in one place.
 
 ## Features
 
