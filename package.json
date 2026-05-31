@@ -5,11 +5,9 @@
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview",
-    "ingest:rss": "node scripts/ingest-rss.mjs"
+    "preview": "astro preview"
   },
   "dependencies": {
-    "@astrojs/rss": "^4.0.9",
     "@astrojs/tailwind": "^5.1.4",
     "astro": "^4.16.18",
     "tailwindcss": "^3.4.17"

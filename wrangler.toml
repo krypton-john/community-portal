@@ -4,9 +4,6 @@
 # Build command:  npm run build
 # Output directory: dist
 # Node version: 20
-#
-# Optional scheduled ingest: use GitHub Actions (.github/workflows/scheduled-build.yml)
-# or Cloudflare Workers cron calling your deploy hook after ingest.
 
 name = "community-portal"
 compatibility_date = "2024-01-01"

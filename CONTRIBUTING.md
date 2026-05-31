@@ -52,17 +52,6 @@ npm run dev
 - **business** — Openings, closures, local business news
 - **community** — General community updates
 
-## Council RSS ingest (optional)
-
-If `COUNCIL_RSS_URL` is set, run before build:
-
-```bash
-npm run ingest:rss
-npm run build
-```
-
-Ingested files go to `src/content/news/ingested/` and are marked `verified: true` with source "Kildare County Council (RSS)". Schedule rebuilds every 15–60 minutes on your host for freshness.
-
 ## Deploy workflow
 
 1. Editor reviews PR

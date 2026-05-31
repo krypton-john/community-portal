@@ -6,7 +6,6 @@ export const siteConfig = {
     'Verified community news, council notices, traffic updates, and local events for Monasterevin residents.',
   url: 'https://krypton-john.github.io/community-portal',
   tipEmail: 'tips@monasterevin-community.ie',
-  councilRssUrl: import.meta.env.COUNCIL_RSS_URL ?? '',
 };
 
 export const categories = [
