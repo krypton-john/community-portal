@@ -8,6 +8,7 @@ Phase 1: a static community news and alerts hub for Monasterevin residents. Veri
 - **News feed** — Filterable by category; toggle verified-only vs all community posts
 - **Events calendar** — Month view + upcoming list (30 days)
 - **Local directory** — Searchable trades & business listings at `/services`
+- **Admin panel** — Browser-based editor at `/admin/` (GitHub token required)
 - **About** — How to submit tips and what "verified" means
 
 ## Local development
@@ -75,6 +76,8 @@ npm run preview
 ## Editor workflow
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for how to add posts, frontmatter rules, and verification policy.
+
+Editors can also use the [admin panel](ADMIN.md) at `/admin/` to manage content in the browser.
 
 ## Roadmap
 
