@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
 import EventCalendar from '../../components/EventCalendar.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../../config';
@@ -38,25 +39,28 @@ for (const day of days) {
   title="Events"
   description={`Local community events calendar and upcoming listings for ${siteConfig.town}.`}
 >
-  <div class="mx-auto max-w-5xl px-4 py-8">
-    <header class="mb-8">
-      <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">Events calendar</h1>
-      <p class="mt-2 text-slate-600">
-        Community events for the month ahead. Click an event for full details.
+  <PageHero
+    title="Events calendar"
+    subtitle="What's on in Monasterevin this month and beyond."
+    tone="gold"
+  />
+
+  <section class="bg-white">
+    <div class="section-inner !pt-10">
+      <EventCalendar
+        events={upcoming}
+        year={year}
+        month={month}
+        days={days}
+        eventsByDay={eventsByDay}
+      />
+
+      <p class="mt-8 text-sm text-slate-500">
+        Showing {new Date(year, month, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}.
+        <a href="/news?category=event" class="font-semibold text-community-teal hover:underline">
+          Browse all event posts
+        </a>
       </p>
-    </header>
-
-    <EventCalendar
-      events={upcoming}
-      year={year}
-      month={month}
-      days={days}
-      eventsByDay={eventsByDay}
-    />
-
-    <p class="mt-8 text-sm text-slate-500">
-      Calendar shows {new Date(year, month, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}.
-      Browse <a href="/news?category=event" class="text-brand-600 hover:underline">all event posts</a> for more.
-    </p>
-  </div>
+    </div>
+  </section>
 </BaseLayout>

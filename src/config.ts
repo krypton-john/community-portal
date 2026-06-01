@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: 'Monasterevin Community Portal',
-  tagline: 'Local news, alerts, and events for Monasterevin',
+  tagline: 'Your neighbour-led hub for local news, events & trusted trades',
   town: 'Monasterevin',
   description:
     'Verified community news, council notices, traffic updates, and local events for Monasterevin residents.',

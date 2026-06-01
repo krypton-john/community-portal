@@ -1,0 +1,53 @@
+---
+import { siteConfig } from '../config';
+
+const base = import.meta.env.BASE_URL;
+const path = Astro.url.pathname.replace(base.replace(/\/$/, ''), '') || '/';
+
+const nav = [
+  { href: `${base}`, label: 'Home', match: (p: string) => p === '/' || p === '' },
+  { href: `${base}news`, label: 'News', match: (p: string) => p.startsWith('/news') },
+  { href: `${base}events`, label: 'Events', match: (p: string) => p.startsWith('/events') },
+  { href: `${base}services`, label: 'Directory', match: (p: string) => p.startsWith('/services') },
+  { href: `${base}about`, label: 'About', match: (p: string) => p.startsWith('/about') },
+];
+---
+
+<header class="sticky top-0 z-50 bg-community-teal shadow-lg">
+  <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-4 py-4 sm:px-6">
+    <a href={base} class="group flex items-center gap-3">
+      <span
+        class="flex h-10 w-10 items-center justify-center rounded-full bg-community-gold text-lg font-bold text-community-teal-dark shadow"
+        aria-hidden="true"
+      >
+        M
+      </span>
+      <div>
+        <p class="font-display text-lg font-bold leading-tight text-white group-hover:text-community-gold-light">
+          {siteConfig.town}
+        </p>
+        <p class="text-xs text-white/80">Community Portal</p>
+      </div>
+    </a>
+    <nav aria-label="Main navigation" class="flex flex-wrap gap-1">
+      {
+        nav.map((item) => {
+          const active = item.match(path);
+          return (
+            <a
+              href={item.href}
+              class:list={[
+                'rounded-full px-4 py-2 text-sm font-semibold transition',
+                active
+                  ? 'bg-community-gold text-community-teal-dark shadow'
+                  : 'text-white hover:bg-white/15',
+              ]}
+            >
+              {item.label}
+            </a>
+          );
+        })
+      }
+    </nav>
+  </div>
+</header>

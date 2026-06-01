@@ -1,0 +1,43 @@
+---
+import { siteConfig } from '../config';
+
+const base = import.meta.env.BASE_URL;
+---
+
+<footer class="bg-community-navy text-white">
+  <div class="section-inner !py-12">
+    <div class="grid gap-10 sm:grid-cols-2 lg:grid-cols-4">
+      <div class="lg:col-span-2">
+        <p class="font-display text-2xl font-bold text-community-gold">{siteConfig.name}</p>
+        <p class="mt-3 max-w-md text-sm leading-relaxed text-white/75">
+          Your neighbour-led hub for {siteConfig.town} — verified local news, events, and a
+          directory of trusted tradespeople. One place to stay connected without the group-chat
+          scroll.
+        </p>
+      </div>
+      <div>
+        <p class="text-sm font-bold uppercase tracking-wide text-community-gold">Explore</p>
+        <ul class="mt-4 space-y-2 text-sm text-white/80">
+          <li><a href={`${base}news`} class="hover:text-white">Community news</a></li>
+          <li><a href={`${base}events`} class="hover:text-white">Events calendar</a></li>
+          <li><a href={`${base}services`} class="hover:text-white">Local directory</a></li>
+          <li><a href={`${base}about`} class="hover:text-white">About &amp; submit tips</a></li>
+        </ul>
+      </div>
+      <div>
+        <p class="text-sm font-bold uppercase tracking-wide text-community-gold">Contact</p>
+        <ul class="mt-4 space-y-2 text-sm text-white/80">
+          <li>
+            <a href={`mailto:${siteConfig.tipEmail}`} class="hover:text-white">
+              {siteConfig.tipEmail}
+            </a>
+          </li>
+          <li>{siteConfig.town}, Co. Kildare</li>
+        </ul>
+      </div>
+    </div>
+    <div class="mt-10 border-t border-white/10 pt-6 text-center text-xs text-white/50">
+      <p>&copy; {new Date().getFullYear()} {siteConfig.name}. Built for neighbours, by neighbours.</p>
+    </div>
+  </div>
+</footer>

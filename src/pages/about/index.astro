@@ -1,55 +1,49 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
 import { siteConfig } from '../../config';
 ---
 
 <BaseLayout title="About" description={`About the ${siteConfig.name} and how to submit news tips.`}>
-  <div class="mx-auto max-w-3xl px-4 py-8">
-    <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">About this portal</h1>
+  <PageHero
+    title="About this portal"
+    subtitle="Built for neighbours — keeping Monasterevin connected."
+    tone="teal"
+  />
 
-    <div class="prose-content mt-6">
-      <p>
-        {siteConfig.name} is a community-run news hub for {siteConfig.town} residents. It brings
-        together verified council notices, traffic updates, local events, and community
-        announcements in one place — so you do not have to scroll through group chat to stay
-        informed.
-      </p>
+  <section class="bg-white">
+    <div class="section-inner !pt-10">
+      <div class="prose-content mx-auto max-w-3xl">
+        <p>
+          {siteConfig.name} is a community-run hub for {siteConfig.town} residents. It brings
+          together verified council notices, traffic updates, local events, and a directory of
+          trusted trades — so you do not have to scroll through group chat to stay informed.
+        </p>
 
-      <h2>What counts as verified?</h2>
-      <p>
-        Posts marked <strong>Verified</strong> come from official sources (Kildare County Council,
-        Gardaí, schools, Irish Water) or have been checked by a community editor. Unverified tips
-        are reviewed before publication.
-      </p>
+        <h2>What counts as verified?</h2>
+        <p>
+          Posts marked <strong>Verified</strong> come from official sources (Kildare County Council,
+          Gardaí, schools, Irish Water) or have been checked by a community editor.
+        </p>
 
-      <h2>Submit a news tip</h2>
-      <p>
-        Phase 1 does not include public submissions on-site. If you have a local news tip, event,
-        or urgent alert, email our editors at{' '}
-        <a href={`mailto:${siteConfig.tipEmail}`}>{siteConfig.tipEmail}</a>.
-      </p>
+        <h2>Submit a news tip</h2>
+        <p>
+          Email our editors at{' '}
+          <a href={`mailto:${siteConfig.tipEmail}`}>{siteConfig.tipEmail}</a> with what happened,
+          when, where, and any official source links.
+        </p>
 
-      <h2>Editors</h2>
-      <p>
-        Trusted editors can manage news and directory listings via the{' '}
-        <a href={`${import.meta.env.BASE_URL}admin/`}>site admin panel</a>.
-        See <a href={`${import.meta.env.BASE_URL}ADMIN.md`}>ADMIN.md</a> for setup instructions.
-      </p>
-      <p>
-        Please include: what happened, when, where, and any official source links if available.
-        Editors will verify before publishing.
-      </p>
+        <h2>Editors</h2>
+        <p>
+          Trusted editors can manage content via the{' '}
+          <a href={`${import.meta.env.BASE_URL}admin/`}>site admin panel</a>.
+        </p>
 
-      <h2>Stay informed</h2>
-      <p>
-        Bookmark this site or share the link in your local group chat so neighbours can find
-        verified updates in one place.
-      </p>
-
-      <h2>Coming soon</h2>
-      <ul>
-        <li>Community sharing and borrowing hub</li>
-      </ul>
+        <h2>Coming soon</h2>
+        <ul>
+          <li>Community sharing and borrowing hub</li>
+        </ul>
+      </div>
     </div>
-  </div>
+  </section>
 </BaseLayout>

@@ -12,56 +12,47 @@ import {
 interface Props {
   post: NewsPost;
   compact?: boolean;
+  featured?: boolean;
 }
 
-const { post, compact = false } = Astro.props;
+const { post, compact = false, featured = false } = Astro.props;
 const slug = getSlug(post);
 const expired = isExpired(post);
 ---
 
 <article
   class:list={[
-    'rounded-lg border bg-white p-4 shadow-sm transition-shadow hover:shadow-md',
-    expired ? 'border-slate-200 opacity-75' : 'border-slate-200',
-    compact ? 'p-3' : 'p-5',
+    'overflow-hidden rounded-xl bg-white shadow-sm ring-1 ring-slate-200/80 transition hover:shadow-md',
+    expired && 'opacity-75',
+    featured ? 'lg:flex' : '',
+    compact ? 'p-4' : 'p-5',
   ]}
 >
-  <div class="mb-2 flex flex-wrap items-center gap-2">
-    <span class={`rounded-full px-2.5 py-0.5 text-xs font-medium ${categoryColor(post.data.category)}`}>
-      {categoryLabel(post.data.category)}
-    </span>
-    {post.data.verified && (
-      <span class="rounded-full bg-emerald-100 px-2.5 py-0.5 text-xs font-medium text-emerald-800">
-        Verified
+  <div class:list={[featured && 'lg:flex-1', 'p-5']}>
+    <div class="mb-3 flex flex-wrap items-center gap-2">
+      <span class={`rounded-full px-2.5 py-0.5 text-xs font-bold ${categoryColor(post.data.category)}`}>
+        {categoryLabel(post.data.category)}
       </span>
-    )}
-    {post.data.urgent && !expired && (
-      <span class="rounded-full bg-red-600 px-2.5 py-0.5 text-xs font-medium text-white">
-        Urgent
-      </span>
-    )}
-    {expired && (
-      <span class="rounded-full bg-slate-200 px-2.5 py-0.5 text-xs font-medium text-slate-600">
-        Ended
-      </span>
-    )}
+      {post.data.verified && (
+        <span class="rounded-full bg-community-teal-light px-2.5 py-0.5 text-xs font-bold text-community-teal-dark">
+          Verified
+        </span>
+      )}
+      {post.data.urgent && !expired && (
+        <span class="rounded-full bg-community-coral px-2.5 py-0.5 text-xs font-bold text-white">
+          Urgent
+        </span>
+      )}
+    </div>
+
+    <h2 class:list={['font-display font-bold text-community-navy', compact ? 'text-base' : 'text-lg']}>
+      <a href={`/news/${slug}`} class="hover:text-community-teal">
+        {post.data.title}
+      </a>
+    </h2>
+
+    <p class="mt-2 text-sm text-slate-500">
+      {post.data.source} · {formatDateTime(post.data.publishedAt)}
+    </p>
   </div>
-
-  <h2 class:list={['font-semibold text-slate-900', compact ? 'text-base' : 'text-lg']}>
-    <a href={`/news/${slug}`} class="hover:text-brand-600">
-      {post.data.title}
-    </a>
-  </h2>
-
-  <p class="mt-2 text-sm text-slate-500">
-    {post.data.source}
-    · Published {formatDateTime(post.data.publishedAt)}
-    {getUpdatedAt(post).getTime() !== post.data.publishedAt.getTime() && (
-      <> · Updated {formatDateTime(getUpdatedAt(post))}</>
-    )}
-  </p>
-
-  {!compact && post.data.location && (
-    <p class="mt-1 text-sm text-slate-600">📍 {post.data.location}</p>
-  )}
 </article>

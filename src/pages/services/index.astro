@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
 import DirectoryTable from '../../components/DirectoryTable.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../../config';
@@ -10,24 +11,22 @@ import { serializeListingsForClient, sortByName } from '../../utils/services';
   title="Local Directory"
   description={`Searchable directory of tradespeople and local businesses in ${siteConfig.town}.`}
 >
-  <div class="mx-auto max-w-6xl px-4 py-8">
-    <header class="mb-8">
-      <h1 class="text-2xl font-bold text-slate-900 sm:text-3xl">Local directory</h1>
-      <p class="mt-2 max-w-2xl text-slate-600">
-        Find trusted tradespeople and local businesses in {siteConfig.town}. Search by name or
-        filter by category. Listings marked <strong>Verified</strong> have been checked by community
-        editors.
+  <PageHero
+    title="Local directory"
+    subtitle="Plumbers, electricians, mechanics & more — trusted local people for local jobs."
+    tone="coral"
+  />
+
+  <section class="bg-community-cream">
+    <div class="section-inner !pt-10">
+      <DirectoryTable listings={serializeListingsForClient((await getCollection('services')).sort(sortByName))} />
+
+      <p class="mt-8 text-center text-sm text-slate-600">
+        Know a business that should be listed? Email{' '}
+        <a href={`mailto:${siteConfig.tipEmail}`} class="font-semibold text-community-teal hover:underline">
+          {siteConfig.tipEmail}
+        </a>
       </p>
-    </header>
-
-    <DirectoryTable listings={serializeListingsForClient((await getCollection('services')).sort(sortByName))} />
-
-    <p class="mt-8 text-sm text-slate-500">
-      Know a local business that should be listed? Email{' '}
-      <a href={`mailto:${siteConfig.tipEmail}`} class="text-brand-600 hover:underline">
-        {siteConfig.tipEmail}
-      </a>
-      .
-    </p>
-  </div>
+    </div>
+  </section>
 </BaseLayout>

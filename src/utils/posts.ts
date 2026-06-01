@@ -102,14 +102,14 @@ export function categoryLabel(category: string): string {
 
 export function categoryColor(category: string): string {
   const colors: Record<string, string> = {
-    alert: 'bg-red-100 text-red-800',
-    council: 'bg-blue-100 text-blue-800',
-    traffic: 'bg-amber-100 text-amber-900',
-    event: 'bg-green-100 text-green-800',
+    alert: 'bg-community-coral/15 text-community-coral-dark',
+    council: 'bg-community-teal-light text-community-teal-dark',
+    traffic: 'bg-community-gold-light text-amber-900',
+    event: 'bg-emerald-100 text-emerald-800',
     business: 'bg-purple-100 text-purple-800',
-    community: 'bg-slate-100 text-slate-800',
+    community: 'bg-sky-100 text-sky-800',
   };
-  return colors[category] ?? 'bg-gray-100 text-gray-800';
+  return colors[category] ?? 'bg-slate-100 text-slate-800';
 }
 
 export function getCalendarDays(year: number, month: number) {
