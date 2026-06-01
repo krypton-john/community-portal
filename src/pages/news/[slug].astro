@@ -9,6 +9,7 @@ import {
   getUpdatedAt,
   isExpired,
 } from '../../utils/posts';
+import { withBase } from '../../utils/paths';
 
 export async function getStaticPaths() {
   const posts = await getCollection('news');
@@ -67,7 +68,7 @@ const description = `${post.data.source}: ${post.data.title}`;
       </div>
 
       <footer class="mx-auto mt-10 max-w-3xl border-t border-slate-200 pt-6">
-        <a href="/news" class="font-semibold text-community-teal hover:underline">← Back to all news</a>
+        <a href={withBase('/news')} class="font-semibold text-community-teal hover:underline">← Back to all news</a>
       </footer>
     </div>
   </article>

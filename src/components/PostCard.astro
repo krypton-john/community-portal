@@ -8,6 +8,7 @@ import {
   getUpdatedAt,
   isExpired,
 } from '../utils/posts';
+import { withBase } from '../utils/paths';
 
 interface Props {
   post: NewsPost;
@@ -46,7 +47,7 @@ const expired = isExpired(post);
     </div>
 
     <h2 class:list={['font-display font-bold text-community-navy', compact ? 'text-base' : 'text-lg']}>
-      <a href={`/news/${slug}`} class="hover:text-community-teal">
+      <a href={withBase(`/news/${slug}`)} class="hover:text-community-teal">
         {post.data.title}
       </a>
     </h2>

@@ -12,6 +12,7 @@ import {
   getUpcomingEvents,
   sortByPublishedDesc,
 } from '../../utils/posts';
+import { withBase } from '../../utils/paths';
 
 const allPosts = (await getCollection('news')).sort(sortByPublishedDesc);
 const activePosts = filterActivePosts(allPosts);
@@ -57,7 +58,7 @@ for (const day of days) {
 
       <p class="mt-8 text-sm text-slate-500">
         Showing {new Date(year, month, 1).toLocaleDateString('en-GB', { month: 'long', year: 'numeric' })}.
-        <a href="/news?category=event" class="font-semibold text-community-teal hover:underline">
+        <a href={withBase('/news?category=event')} class="font-semibold text-community-teal hover:underline">
           Browse all event posts
         </a>
       </p>

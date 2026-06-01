@@ -9,6 +9,7 @@ import {
   getSlug,
   sortByPublishedDesc,
 } from '../utils/posts';
+import { withBase } from '../utils/paths';
 
 const FEATURED_SLUG = 'leaving-junior-cert-best-of-luck-2026';
 
@@ -36,8 +37,8 @@ const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).
         group chat.
       </p>
       <div class="mt-8 flex flex-wrap gap-4">
-        <a href="/news" class="btn-primary">Read the news</a>
-        <a href="/services" class="btn-secondary">Browse directory</a>
+        <a href={withBase('/news')} class="btn-primary">Read the news</a>
+        <a href={withBase('/services')} class="btn-secondary">Browse directory</a>
       </div>
     </div>
   </section>
@@ -50,7 +51,7 @@ const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).
           <p class="text-sm font-bold uppercase tracking-wide text-community-coral">Latest news</p>
           <h2 class="section-title mt-1 text-community-navy">What's happening in {siteConfig.town}</h2>
         </div>
-        <a href="/news" class="btn-outline">View all news</a>
+        <a href={withBase('/news')} class="btn-outline">View all news</a>
       </div>
 
       {
@@ -64,7 +65,7 @@ const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).
               </div>
               <div class="p-6 lg:col-span-5 lg:p-8">
                 <h3 class="font-display text-2xl font-bold text-community-navy sm:text-3xl">
-                  <a href={`/news/${getSlug(featured)}`} class="hover:text-community-teal">
+                  <a href={withBase(`/news/${getSlug(featured)}`)} class="hover:text-community-teal">
                     {featured.data.title}
                   </a>
                 </h3>
@@ -86,7 +87,7 @@ const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).
                   — covering study, wellbeing, and navigating this important time.
                 </p>
                 <a
-                  href={`/news/${getSlug(featured)}`}
+                  href={withBase(`/news/${getSlug(featured)}`)}
                   class="mt-6 inline-flex items-center gap-2 font-semibold text-community-coral hover:text-community-coral-dark"
                 >
                   Read full post →
@@ -127,7 +128,7 @@ const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).
               Searchable listings for trades &amp; businesses in {siteConfig.town}.
             </p>
             <a
-              href="/services"
+              href={withBase('/services')}
               class="mt-6 inline-flex rounded-full bg-white px-6 py-3 text-sm font-bold text-community-coral shadow transition hover:bg-community-gold-light"
             >
               Browse directory →
