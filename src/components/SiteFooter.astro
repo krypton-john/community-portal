@@ -36,7 +36,11 @@ import { withBase } from '../utils/paths';
       </div>
     </div>
     <div class="mt-10 border-t border-white/10 pt-6 text-center text-xs text-white/50">
-      <p>&copy; {new Date().getFullYear()} {siteConfig.name}. Built for neighbours, by neighbours.</p>
+      <p>
+        &copy; {new Date().getFullYear()} {siteConfig.name}. Built for neighbours, by neighbours.
+        ·
+        <a href={withBase('/privacy')} class="underline hover:text-white/80">Privacy Policy</a>
+      </p>
     </div>
   </div>
 </footer>

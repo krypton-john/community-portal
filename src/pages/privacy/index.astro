@@ -1,0 +1,88 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { siteConfig } from '../../config';
+
+const contactEmail = siteConfig.tipEmail;
+---
+
+<BaseLayout
+  title="Privacy Policy"
+  description="Privacy policy for my-monasterevin.ie — how we handle community and business listing data."
+>
+  <PageHero
+    title="Privacy Policy"
+    subtitle="Last updated: June 1, 2026"
+    tone="teal"
+  />
+
+  <section class="bg-white">
+    <div class="section-inner !pt-10">
+      <div class="prose-content mx-auto max-w-3xl">
+        <h2>1. Our Commitment</h2>
+        <p>
+          my-monasterevin.ie is committed to protecting the privacy of our local community. Because
+          we operate as a public information hub, we minimize data collection to the absolute
+          essentials.
+        </p>
+
+        <h2>2. What We Do Not Collect</h2>
+        <p>
+          We do not use tracking cookies, analytics scripts that track individual user behaviour, or
+          advertising trackers. We do not require users to sign in or create accounts, meaning we do
+          not store personal data for general visitors.
+        </p>
+
+        <h2>3. Business Listings &amp; Data</h2>
+        <p>
+          We maintain a directory of local businesses to provide value to our community.
+        </p>
+        <p>
+          <strong>Information collection:</strong> We only collect and publish information that a
+          business owner or representative explicitly submits to us for the purpose of being listed
+          (e.g. business name, contact details, address, or service description).
+        </p>
+        <p>
+          <strong>Consent:</strong> By submitting your information to my-monasterevin.ie, you consent
+          to have that specific information displayed publicly on our website.
+        </p>
+        <p>
+          <strong>Data accuracy:</strong> We rely on the information provided by the business. If
+          your details change, please contact us at{' '}
+          <a href={`mailto:${contactEmail}`}>{contactEmail}</a> so we can update them.
+        </p>
+
+        <h2>4. Your Right to Removal (The "Right to be Forgotten")</h2>
+        <p>
+          We respect your control over your information. If you are a business owner and would like
+          your listing modified or completely removed from our site, please contact us at{' '}
+          <a href={`mailto:${contactEmail}`}>{contactEmail}</a>.
+        </p>
+        <p>
+          We commit to processing all take-down requests within 3–5 business days. Once processed,
+          the information will be permanently deleted from our live site and our internal records.
+        </p>
+
+        <h2>5. Third-Party Links</h2>
+        <p>
+          Our site may contain links to other websites (e.g. local government pages or business
+          websites). We are not responsible for the privacy practices of those external sites. We
+          encourage you to read their privacy policies if you choose to visit them.
+        </p>
+
+        <h2>6. Updates to This Policy</h2>
+        <p>
+          We may update this policy occasionally to reflect changes in our site structure. Any
+          changes will be posted here with an updated "Last Updated" date.
+        </p>
+
+        <h2>7. Contact Us</h2>
+        <p>
+          If you have any questions about this policy or need to request the removal of a listing,
+          please contact us at:{' '}
+          <a href={`mailto:${contactEmail}`}>{contactEmail}</a>
+        </p>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
