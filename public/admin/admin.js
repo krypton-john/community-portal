@@ -164,6 +164,75 @@ function slugify(text) {
     .slice(0, 60);
 }
 
+function isValidWebUrl(value) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function isValidEmail(value) {
+  return !value || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function validateRequired(errors, value, label) {
+  if (!value) errors.push(`${label} is required.`);
+}
+
+function validateWebUrl(errors, value, label) {
+  if (!isValidWebUrl(value)) {
+    errors.push(`${label} must be a valid http or https URL.`);
+  }
+}
+
+function validateEditorPayload(payload) {
+  const errors = [];
+
+  if (state.tab === 'news') {
+    validateRequired(errors, payload.data.title, 'Title');
+    validateRequired(errors, payload.data.publishedAt, 'Published at');
+    validateRequired(errors, payload.data.source, 'Source');
+    validateWebUrl(errors, payload.data.sourceUrl, 'Source URL');
+    if (!slugify(payload.data.permalink || payload.data.title)) {
+      errors.push('Permalink must contain at least one letter or number.');
+    }
+    return errors;
+  }
+
+  validateRequired(errors, payload.data.name, 'Business name');
+  validateRequired(errors, payload.data.address, 'Address');
+  if (!isValidEmail(payload.data.email)) {
+    errors.push('Email must be a valid email address.');
+  }
+  validateWebUrl(errors, payload.data.website, 'Website');
+  validateWebUrl(errors, payload.data.social.facebook, 'Facebook URL');
+  validateWebUrl(errors, payload.data.social.instagram, 'Instagram URL');
+  validateWebUrl(errors, payload.data.social.twitter, 'X / Twitter URL');
+  validateWebUrl(errors, payload.data.social.linkedin, 'LinkedIn URL');
+  return errors;
+}
+
+async function assertUniqueNewsPermalink(slug) {
+  const files = await listFiles(CONFIG.paths.news);
+
+  for (const fileInfo of files) {
+    if (fileInfo.path === state.editing.path) continue;
+
+    const file = await getFile(fileInfo.path);
+    const { data } = parseMarkdownFile(file.decoded);
+    const existingSlug = String(
+      data.permalink || fileInfo.name.replace(/\.md$/, ''),
+    ).trim();
+
+    if (existingSlug === slug) {
+      throw new Error(`Permalink "${slug}" is already used by ${fileInfo.name}. Choose a unique permalink.`);
+    }
+  }
+}
+
 function defaultNewsData() {
   const now = new Date().toISOString();
   return {
@@ -351,12 +420,9 @@ async function saveEditor() {
   const payload = readForm();
   if (!payload) return;
 
-  if (state.tab === 'news' && !payload.data.title) {
-    setMessage('Title is required.', 'error');
-    return;
-  }
-  if (state.tab === 'services' && !payload.data.name) {
-    setMessage('Business name is required.', 'error');
+  const validationErrors = validateEditorPayload(payload);
+  if (validationErrors.length > 0) {
+    setMessage(validationErrors.join(' '), 'error');
     return;
   }
 
@@ -369,8 +435,9 @@ async function saveEditor() {
     let message;
 
     if (state.tab === 'news') {
-      const slug = payload.data.permalink || slugify(payload.data.title);
+      const slug = slugify(payload.data.permalink || payload.data.title);
       payload.data.permalink = slug;
+      await assertUniqueNewsPermalink(slug);
       if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
       content = buildMarkdownFile(payload.data, payload.body);
       message = state.editing.isNew
