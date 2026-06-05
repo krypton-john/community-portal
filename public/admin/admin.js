@@ -1,3 +1,4 @@
+import { decodeBase64Utf8, encodeBase64Utf8 } from './encoding.js';
 import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
 
 const CONFIG = {
@@ -98,14 +99,14 @@ async function getFile(path) {
   const data = await githubFetch(
     `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}?ref=${CONFIG.branch}`,
   );
-  const content = data.content ? atob(data.content.replace(/\n/g, '')) : '';
+  const content = data.content ? decodeBase64Utf8(data.content) : '';
   return { ...data, decoded: content };
 }
 
 async function saveFile(path, content, message, sha) {
   const body = {
     message,
-    content: btoa(unescape(encodeURIComponent(content))),
+    content: encodeBase64Utf8(content),
     branch: CONFIG.branch,
   };
   if (sha) body.sha = sha;
