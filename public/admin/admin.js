@@ -1,5 +1,5 @@
 import { decodeBase64Utf8, encodeBase64Utf8 } from './encoding.js';
-import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
+import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.2.0/+esm';
 
 const CONFIG = {
   owner: 'krypton-john',
