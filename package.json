@@ -3,13 +3,17 @@
   "type": "module",
   "version": "0.1.0",
   "scripts": {
+    "admin:assets": "tailwindcss -i ./src/styles/admin.css --content \"./public/admin/**/*.{html,js}\" -o ./public/admin/admin.css --minify && node ./scripts/sync-admin-vendor.mjs",
+    "predev": "npm run admin:assets",
     "dev": "astro dev",
+    "prebuild": "npm run admin:assets",
     "build": "astro build",
     "preview": "astro preview"
   },
   "dependencies": {
     "@astrojs/tailwind": "^5.1.4",
     "astro": "^4.16.18",
+    "js-yaml": "^4.2.0",
     "tailwindcss": "^3.4.17"
   },
   "devDependencies": {

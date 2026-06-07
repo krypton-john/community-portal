@@ -1,12 +1,14 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
+import UrgentBanner from '../components/UrgentBanner.astro';
 import { getCollection } from 'astro:content';
 import { siteConfig } from '../config';
 import {
   filterActivePosts,
   filterVerified,
   getSlug,
+  isUrgentActive,
   sortByPublishedDesc,
 } from '../utils/posts';
 import { withBase } from '../utils/paths';
@@ -15,6 +17,7 @@ const FEATURED_SLUG = 'leaving-junior-cert-best-of-luck-2026';
 
 const allPosts = (await getCollection('news')).sort(sortByPublishedDesc);
 const activePosts = filterActivePosts(allPosts);
+const urgentPosts = activePosts.filter((post) => isUrgentActive(post));
 const verifiedPosts = filterVerified(activePosts, true);
 
 const featured = verifiedPosts.find((p) => getSlug(p) === FEATURED_SLUG) ?? verifiedPosts[0];
@@ -42,6 +45,16 @@ const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).
       </div>
     </div>
   </section>
+
+  {
+    urgentPosts.length > 0 && (
+      <section class="bg-white" aria-label="Urgent alerts">
+        <div class="section-inner py-8 sm:py-10 lg:py-12">
+          <UrgentBanner posts={urgentPosts} />
+        </div>
+      </section>
+    )
+  }
 
   <!-- Section 2: Latest news -->
   <section class="bg-white" aria-label="Latest news">

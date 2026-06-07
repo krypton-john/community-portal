@@ -1,4 +1,4 @@
-import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
+import { dump as dumpYaml, load as loadYaml } from './vendor/js-yaml.mjs';
 
 const CONFIG = {
   owner: 'krypton-john',
@@ -125,7 +125,7 @@ async function deleteFile(path, sha, message) {
 function parseMarkdownFile(raw) {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) return { data: {}, body: raw.trim() };
-  const data = YAML.load(match[1]) ?? {};
+  const data = loadYaml(match[1]) ?? {};
   return { data, body: match[2].trim() };
 }
 
@@ -135,11 +135,11 @@ function buildMarkdownFile(data, body) {
     if (fm[k] === '' || fm[k] == null) delete fm[k];
   });
   if (Array.isArray(fm.tags) && fm.tags.length === 0) fm.tags = [];
-  return `---\n${YAML.dump(fm, { lineWidth: -1 })}---\n\n${body.trim()}\n`;
+  return `---\n${dumpYaml(fm, { lineWidth: -1 })}---\n\n${body.trim()}\n`;
 }
 
 function parseYamlFile(raw) {
-  return YAML.load(raw) ?? {};
+  return loadYaml(raw) ?? {};
 }
 
 function buildYamlFile(data) {
@@ -153,7 +153,7 @@ function buildYamlFile(data) {
   Object.keys(cleaned).forEach((k) => {
     if (cleaned[k] === '' || cleaned[k] == null) delete cleaned[k];
   });
-  return YAML.dump(cleaned, { lineWidth: -1 });
+  return dumpYaml(cleaned, { lineWidth: -1 });
 }
 
 function slugify(text) {
@@ -294,6 +294,60 @@ function toIso(val) {
   }
 }
 
+function isValidAbsoluteUrl(value) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function isValidEmail(value) {
+  if (!value) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function validatePayload(payload) {
+  if (state.tab === 'news') {
+    if (!payload.data.title) return 'Title is required.';
+    if (!payload.data.publishedAt) return 'Published at is required.';
+    if (!payload.data.source) return 'Source is required.';
+    if (!isValidAbsoluteUrl(payload.data.sourceUrl)) {
+      return 'Source URL must be a valid http(s) URL.';
+    }
+    if (!slugify(payload.data.permalink || payload.data.title)) {
+      return 'Title or permalink must contain at least one letter or number.';
+    }
+    return null;
+  }
+
+  if (!payload.data.name) return 'Business name is required.';
+  if (!payload.data.address) return 'Address is required.';
+  if (!slugify(payload.data.name)) {
+    return 'Business name must contain at least one letter or number.';
+  }
+  if (!isValidEmail(payload.data.email)) return 'Email must be a valid email address.';
+  if (!isValidAbsoluteUrl(payload.data.website)) {
+    return 'Website must be a valid http(s) URL.';
+  }
+
+  const socialLabels = {
+    facebook: 'Facebook URL',
+    instagram: 'Instagram URL',
+    twitter: 'X / Twitter URL',
+    linkedin: 'LinkedIn URL',
+  };
+  for (const [key, label] of Object.entries(socialLabels)) {
+    if (!isValidAbsoluteUrl(payload.data.social?.[key])) {
+      return `${label} must be a valid http(s) URL.`;
+    }
+  }
+
+  return null;
+}
+
 function readForm() {
   const form = document.getElementById('edit-form');
   if (!form) return null;
@@ -351,12 +405,9 @@ async function saveEditor() {
   const payload = readForm();
   if (!payload) return;
 
-  if (state.tab === 'news' && !payload.data.title) {
-    setMessage('Title is required.', 'error');
-    return;
-  }
-  if (state.tab === 'services' && !payload.data.name) {
-    setMessage('Business name is required.', 'error');
+  const validationError = validatePayload(payload);
+  if (validationError) {
+    setMessage(validationError, 'error');
     return;
   }
 
@@ -369,7 +420,7 @@ async function saveEditor() {
     let message;
 
     if (state.tab === 'news') {
-      const slug = payload.data.permalink || slugify(payload.data.title);
+      const slug = slugify(payload.data.permalink || payload.data.title);
       payload.data.permalink = slug;
       if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
       content = buildMarkdownFile(payload.data, payload.body);

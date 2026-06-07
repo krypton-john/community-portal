@@ -4,15 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="robots" content="noindex, nofollow" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src https://api.github.com; img-src 'self' data:; base-uri 'none'; form-action 'none'; frame-ancestors 'none';"
+    />
     <title>Site Admin | Monasterevin Community Portal</title>
     <link rel="icon" type="image/svg+xml" href="../favicon.svg" />
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      [hidden] { display: none !important; }
-      .tab-active { @apply border-brand-600 text-brand-700; }
-    </style>
+    <link rel="stylesheet" href="./admin.css" />
   </head>
-  <body class="min-h-screen bg-slate-100 text-slate-900 antialiased">
+  <body>
     <div id="admin-root" class="mx-auto max-w-6xl px-4 py-8"></div>
     <script type="module" src="./admin.js"></script>
   </body>
