@@ -37,7 +37,7 @@ const SERVICE_CATEGORIES = [
 const TOKEN_KEY = 'mcp_admin_token';
 
 const state = {
-  token: sessionStorage.getItem(TOKEN_KEY) ?? '',
+  token: typeof sessionStorage !== 'undefined' ? sessionStorage.getItem(TOKEN_KEY) ?? '' : '',
   tab: 'news',
   items: [],
   editing: null,
@@ -46,7 +46,7 @@ const state = {
   messageType: 'info',
 };
 
-const root = document.getElementById('admin-root');
+const root = typeof document !== 'undefined' ? document.getElementById('admin-root') : null;
 
 function escapeHtml(str) {
   return String(str)
@@ -129,7 +129,7 @@ function parseMarkdownFile(raw) {
   return { data, body: match[2].trim() };
 }
 
-function buildMarkdownFile(data, body) {
+export function buildMarkdownFile(data, body) {
   const fm = { ...data };
   Object.keys(fm).forEach((k) => {
     if (fm[k] === '' || fm[k] == null) delete fm[k];
@@ -142,7 +142,7 @@ function parseYamlFile(raw) {
   return loadYaml(raw) ?? {};
 }
 
-function buildYamlFile(data) {
+export function buildYamlFile(data) {
   const cleaned = { ...data };
   if (cleaned.social) {
     Object.keys(cleaned.social).forEach((k) => {
@@ -309,8 +309,8 @@ function isValidEmail(value) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 }
 
-function validatePayload(payload) {
-  if (state.tab === 'news') {
+export function validatePayloadForTab(tab, payload) {
+  if (tab === 'news') {
     if (!payload.data.title) return 'Title is required.';
     if (!payload.data.publishedAt) return 'Published at is required.';
     if (!payload.data.source) return 'Source is required.';
@@ -346,6 +346,10 @@ function validatePayload(payload) {
   }
 
   return null;
+}
+
+function validatePayload(payload) {
+  return validatePayloadForTab(state.tab, payload);
 }
 
 function readForm() {
@@ -655,6 +659,7 @@ function renderDashboard() {
 }
 
 function render() {
+  if (!root) return;
   root.innerHTML = state.token ? renderDashboard() : renderLogin();
   bindEvents();
 }
@@ -705,6 +710,7 @@ function bindEvents() {
 }
 
 async function init() {
+  if (!root) return;
   if (state.token) {
     try {
       await verifyToken();

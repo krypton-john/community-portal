@@ -8,7 +8,8 @@
     "dev": "astro dev",
     "prebuild": "npm run admin:assets",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test:admin": "node ./scripts/test-admin-core.mjs"
   },
   "dependencies": {
     "@astrojs/tailwind": "^5.1.4",
