@@ -1,4 +1,5 @@
-import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
+import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.2.0/+esm';
+import { resolveSlug } from './slug.js';
 
 const CONFIG = {
   owner: 'krypton-john',
@@ -154,14 +155,6 @@ function buildYamlFile(data) {
     if (cleaned[k] === '' || cleaned[k] == null) delete cleaned[k];
   });
   return YAML.dump(cleaned, { lineWidth: -1 });
-}
-
-function slugify(text) {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/^-|-$/g, '')
-    .slice(0, 60);
 }
 
 function defaultNewsData() {
@@ -369,7 +362,8 @@ async function saveEditor() {
     let message;
 
     if (state.tab === 'news') {
-      const slug = payload.data.permalink || slugify(payload.data.title);
+      const slug = resolveSlug(payload.data.permalink, payload.data.title);
+      if (!slug) throw new Error('Permalink must include at least one letter or number.');
       payload.data.permalink = slug;
       if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
       content = buildMarkdownFile(payload.data, payload.body);
@@ -378,8 +372,9 @@ async function saveEditor() {
         : `Update news: ${payload.data.title}`;
     } else {
       const slug = state.editing.isNew
-        ? slugify(payload.data.name)
+        ? resolveSlug(payload.data.name)
         : state.editing.path.split('/').pop().replace('.yaml', '');
+      if (!slug) throw new Error('Business name must include at least one letter or number.');
       if (!path) path = `${CONFIG.paths.services}/${slug}.yaml`;
       content = buildYamlFile(payload.data);
       message = state.editing.isNew

@@ -1,9 +1,10 @@
 import type { CollectionEntry } from 'astro:content';
+import { slugify } from './slugs';
 
 export type NewsPost = CollectionEntry<'news'>;
 
 export function getSlug(post: NewsPost): string {
-  return post.data.permalink ?? post.slug;
+  return slugify(post.data.permalink ?? post.slug) || slugify(post.slug);
 }
 
 export function getUpdatedAt(post: NewsPost): Date {
