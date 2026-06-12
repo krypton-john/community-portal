@@ -164,6 +164,87 @@ function slugify(text) {
     .slice(0, 60);
 }
 
+function fileStem(path) {
+  return path.split('/').pop().replace(/\.[^.]+$/, '');
+}
+
+function safeSlug(value, fallback = '') {
+  return slugify(value || fallback);
+}
+
+function isHttpUrl(value) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function isValidEmail(value) {
+  if (!value) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function requireFields(data, fields) {
+  return fields
+    .filter(([key]) => !data[key])
+    .map(([, label]) => `${label} is required.`);
+}
+
+function validateEditorPayload(payload) {
+  if (state.tab === 'news') {
+    const errors = requireFields(payload.data, [
+      ['title', 'Title'],
+      ['publishedAt', 'Published at'],
+      ['source', 'Source'],
+    ]);
+    const permalink = payload.data.permalink.trim();
+    const slug = safeSlug(permalink || payload.data.title);
+
+    if (!slug) errors.push('Permalink must contain at least one letter or number.');
+    if (permalink && permalink !== slug) {
+      errors.push('Permalink may only use lowercase letters, numbers, and hyphens.');
+    }
+    if (!isHttpUrl(payload.data.sourceUrl)) {
+      errors.push('Source URL must be a valid http or https URL.');
+    }
+
+    return { errors, slug };
+  }
+
+  const errors = requireFields(payload.data, [
+    ['name', 'Business name'],
+    ['address', 'Address'],
+  ]);
+  const slug = safeSlug(payload.data.name);
+
+  if (!slug) errors.push('Business name must contain at least one letter or number.');
+  if (!isValidEmail(payload.data.email)) errors.push('Email must be valid.');
+  if (!isHttpUrl(payload.data.website)) errors.push('Website must be a valid http or https URL.');
+
+  Object.entries(payload.data.social ?? {}).forEach(([key, value]) => {
+    if (!isHttpUrl(value)) errors.push(`${key} URL must be a valid http or https URL.`);
+  });
+
+  return { errors, slug };
+}
+
+async function newsSlugExists(slug, currentPath) {
+  for (const item of state.items) {
+    if (item.path === currentPath) continue;
+
+    const file = await getFile(item.path);
+    const { data } = parseMarkdownFile(file.decoded);
+    const existingSlug = safeSlug(data.permalink || fileStem(item.path));
+
+    if (existingSlug === slug) return true;
+  }
+
+  return false;
+}
+
 function defaultNewsData() {
   const now = new Date().toISOString();
   return {
@@ -351,12 +432,9 @@ async function saveEditor() {
   const payload = readForm();
   if (!payload) return;
 
-  if (state.tab === 'news' && !payload.data.title) {
-    setMessage('Title is required.', 'error');
-    return;
-  }
-  if (state.tab === 'services' && !payload.data.name) {
-    setMessage('Business name is required.', 'error');
+  const validation = validateEditorPayload(payload);
+  if (validation.errors.length > 0) {
+    setMessage(validation.errors.join(' '), 'error');
     return;
   }
 
@@ -369,7 +447,10 @@ async function saveEditor() {
     let message;
 
     if (state.tab === 'news') {
-      const slug = payload.data.permalink || slugify(payload.data.title);
+      const slug = validation.slug;
+      if (await newsSlugExists(slug, path)) {
+        throw new Error('Another news post already uses this permalink.');
+      }
       payload.data.permalink = slug;
       if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
       content = buildMarkdownFile(payload.data, payload.body);
@@ -378,8 +459,8 @@ async function saveEditor() {
         : `Update news: ${payload.data.title}`;
     } else {
       const slug = state.editing.isNew
-        ? slugify(payload.data.name)
-        : state.editing.path.split('/').pop().replace('.yaml', '');
+        ? validation.slug
+        : fileStem(state.editing.path);
       if (!path) path = `${CONFIG.paths.services}/${slug}.yaml`;
       content = buildYamlFile(payload.data);
       message = state.editing.isNew
