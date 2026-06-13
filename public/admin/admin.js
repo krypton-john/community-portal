@@ -1,5 +1,3 @@
-import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
-
 const CONFIG = {
   owner: 'krypton-john',
   repo: 'community-portal',
@@ -135,11 +133,11 @@ function buildMarkdownFile(data, body) {
     if (fm[k] === '' || fm[k] == null) delete fm[k];
   });
   if (Array.isArray(fm.tags) && fm.tags.length === 0) fm.tags = [];
-  return `---\n${YAML.dump(fm, { lineWidth: -1 })}---\n\n${body.trim()}\n`;
+  return `---\n${dumpYaml(fm)}---\n\n${body.trim()}\n`;
 }
 
 function parseYamlFile(raw) {
-  return YAML.load(raw) ?? {};
+  return parseYaml(raw);
 }
 
 function buildYamlFile(data) {
@@ -153,7 +151,87 @@ function buildYamlFile(data) {
   Object.keys(cleaned).forEach((k) => {
     if (cleaned[k] === '' || cleaned[k] == null) delete cleaned[k];
   });
-  return YAML.dump(cleaned, { lineWidth: -1 });
+  return dumpYaml(cleaned);
+}
+
+function parseYaml(raw) {
+  const rootObj = {};
+  let currentMap = null;
+
+  raw.split(/\r?\n/).forEach((line) => {
+    if (!line.trim() || line.trimStart().startsWith('#')) return;
+
+    const nested = line.match(/^  ([^:]+):\s*(.*)$/);
+    if (nested && currentMap) {
+      currentMap[nested[1].trim()] = parseYamlScalar(nested[2].trim());
+      return;
+    }
+
+    const topLevel = line.match(/^([^:\s][^:]*):\s*(.*)$/);
+    if (!topLevel) return;
+
+    const key = topLevel[1].trim();
+    const value = topLevel[2].trim();
+    if (value === '') {
+      rootObj[key] = {};
+      currentMap = rootObj[key];
+    } else {
+      rootObj[key] = parseYamlScalar(value);
+      currentMap = null;
+    }
+  });
+
+  return rootObj;
+}
+
+function parseYamlScalar(value) {
+  if (value === 'true') return true;
+  if (value === 'false') return false;
+  if (value === 'null' || value === '~') return null;
+  if (value.startsWith('[') && value.endsWith(']')) {
+    const inner = value.slice(1, -1).trim();
+    if (!inner) return [];
+    try {
+      return JSON.parse(value);
+    } catch {
+      return inner.split(',').map((item) => parseYamlScalar(item.trim()));
+    }
+  }
+  if (
+    (value.startsWith('"') && value.endsWith('"')) ||
+    (value.startsWith("'") && value.endsWith("'"))
+  ) {
+    try {
+      return JSON.parse(value);
+    } catch {
+      return value.slice(1, -1).replaceAll("''", "'");
+    }
+  }
+  return value;
+}
+
+function dumpYaml(data) {
+  return Object.entries(data)
+    .map(([key, value]) => {
+      if (Array.isArray(value)) {
+        return `${key}: [${value.map(formatYamlScalar).join(', ')}]`;
+      }
+      if (value && typeof value === 'object') {
+        const nested = Object.entries(value)
+          .map(([nestedKey, nestedValue]) => `  ${nestedKey}: ${formatYamlScalar(nestedValue)}`)
+          .join('\n');
+        return `${key}:\n${nested}`;
+      }
+      return `${key}: ${formatYamlScalar(value)}`;
+    })
+    .join('\n')
+    .concat('\n');
+}
+
+function formatYamlScalar(value) {
+  if (typeof value === 'boolean') return value ? 'true' : 'false';
+  if (value == null) return 'null';
+  return JSON.stringify(String(value));
 }
 
 function slugify(text) {
