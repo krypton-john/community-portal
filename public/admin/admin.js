@@ -48,6 +48,22 @@ const state = {
 
 const root = document.getElementById('admin-root');
 
+function decodeBase64Content(content) {
+  const binary = atob(content.replace(/\n/g, ''));
+  const bytes = Uint8Array.from(binary, (char) => char.charCodeAt(0));
+  return new TextDecoder().decode(bytes);
+}
+
+function encodeBase64Content(content) {
+  const bytes = new TextEncoder().encode(content);
+  const chunkSize = 0x8000;
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
 function escapeHtml(str) {
   return String(str)
     .replaceAll('&', '&amp;')
@@ -98,14 +114,14 @@ async function getFile(path) {
   const data = await githubFetch(
     `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}?ref=${CONFIG.branch}`,
   );
-  const content = data.content ? atob(data.content.replace(/\n/g, '')) : '';
+  const content = data.content ? decodeBase64Content(data.content) : '';
   return { ...data, decoded: content };
 }
 
 async function saveFile(path, content, message, sha) {
   const body = {
     message,
-    content: btoa(unescape(encodeURIComponent(content))),
+    content: encodeBase64Content(content),
     branch: CONFIG.branch,
   };
   if (sha) body.sha = sha;
