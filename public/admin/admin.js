@@ -35,6 +35,7 @@ const SERVICE_CATEGORIES = [
 ];
 
 const TOKEN_KEY = 'mcp_admin_token';
+const SLUG_PATTERN = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
 
 const state = {
   token: sessionStorage.getItem(TOKEN_KEY) ?? '',
@@ -82,6 +83,25 @@ async function githubFetch(path, options = {}) {
   return res.json();
 }
 
+function decodeBase64Utf8(content) {
+  const binary = atob(content.replace(/\n/g, ''));
+  const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i += 1) {
+    bytes[i] = binary.charCodeAt(i);
+  }
+  return new TextDecoder().decode(bytes);
+}
+
+function encodeBase64Utf8(content) {
+  const bytes = new TextEncoder().encode(content);
+  const chunkSize = 0x8000;
+  let binary = '';
+  for (let i = 0; i < bytes.length; i += chunkSize) {
+    binary += String.fromCharCode(...bytes.subarray(i, i + chunkSize));
+  }
+  return btoa(binary);
+}
+
 async function verifyToken() {
   await githubFetch('/user');
 }
@@ -98,14 +118,14 @@ async function getFile(path) {
   const data = await githubFetch(
     `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}?ref=${CONFIG.branch}`,
   );
-  const content = data.content ? atob(data.content.replace(/\n/g, '')) : '';
+  const content = data.content ? decodeBase64Utf8(data.content) : '';
   return { ...data, decoded: content };
 }
 
 async function saveFile(path, content, message, sha) {
   const body = {
     message,
-    content: btoa(unescape(encodeURIComponent(content))),
+    content: encodeBase64Utf8(content),
     branch: CONFIG.branch,
   };
   if (sha) body.sha = sha;
@@ -162,6 +182,82 @@ function slugify(text) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-|-$/g, '')
     .slice(0, 60);
+}
+
+function isValidUrl(value) {
+  if (!value) return true;
+  try {
+    new URL(value);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function isValidEmail(value) {
+  if (!value) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function validateSlug(slug, label) {
+  if (!slug) {
+    return `${label} must include at least one letter or number.`;
+  }
+  if (!SLUG_PATTERN.test(slug)) {
+    return `${label} can only use lowercase letters, numbers, and single hyphens.`;
+  }
+  return null;
+}
+
+function validatePayload(payload, slug) {
+  const data = payload.data;
+  if (state.tab === 'news') {
+    if (!data.title) return 'Title is required.';
+    const slugError = validateSlug(slug, 'Permalink');
+    if (slugError) return slugError;
+    if (!data.publishedAt) return 'Published at is required and must be a valid date.';
+    if (!data.source) return 'Source is required.';
+    if (data.sourceUrl && !isValidUrl(data.sourceUrl)) {
+      return 'Source URL must be a valid URL, including https://.';
+    }
+    return null;
+  }
+
+  if (!data.name) return 'Business name is required.';
+  if (state.editing.isNew) {
+    const slugError = validateSlug(slug, 'Business name slug');
+    if (slugError) return slugError;
+  }
+  if (!data.address) return 'Address is required.';
+  if (data.email && !isValidEmail(data.email)) {
+    return 'Email must be a valid email address.';
+  }
+  if (data.website && !isValidUrl(data.website)) {
+    return 'Website must be a valid URL, including https://.';
+  }
+  const social = data.social ?? {};
+  for (const [name, value] of Object.entries(social)) {
+    if (value && !isValidUrl(value)) {
+      return `${name[0].toUpperCase()}${name.slice(1)} URL must be a valid URL, including https://.`;
+    }
+  }
+  return null;
+}
+
+function itemAtPath(path) {
+  return state.items.find((item) => item.path === path);
+}
+
+async function findNewsSlugOwner(slug, currentPath) {
+  for (const item of state.items) {
+    if (item.path === currentPath) continue;
+
+    const file = await getFile(item.path);
+    const { data } = parseMarkdownFile(file.decoded);
+    const existingSlug = data.permalink || item.name.replace(/\.md$/, '');
+    if (existingSlug === slug) return item;
+  }
+  return null;
 }
 
 function defaultNewsData() {
@@ -351,12 +447,14 @@ async function saveEditor() {
   const payload = readForm();
   if (!payload) return;
 
-  if (state.tab === 'news' && !payload.data.title) {
-    setMessage('Title is required.', 'error');
-    return;
-  }
-  if (state.tab === 'services' && !payload.data.name) {
-    setMessage('Business name is required.', 'error');
+  const slug = state.tab === 'news'
+    ? payload.data.permalink || slugify(payload.data.title)
+    : state.editing.isNew
+      ? slugify(payload.data.name)
+      : state.editing.path.split('/').pop().replace('.yaml', '');
+  const validationError = validatePayload(payload, slug);
+  if (validationError) {
+    setMessage(validationError, 'error');
     return;
   }
 
@@ -369,18 +467,26 @@ async function saveEditor() {
     let message;
 
     if (state.tab === 'news') {
-      const slug = payload.data.permalink || slugify(payload.data.title);
       payload.data.permalink = slug;
       if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
+      const existingItem = itemAtPath(path);
+      if (state.editing.isNew && existingItem) {
+        throw new Error(`A news file already exists for "${slug}". Choose a different permalink.`);
+      }
+      const duplicate = await findNewsSlugOwner(slug, state.editing.path);
+      if (duplicate) {
+        throw new Error(`Another news post already uses the permalink "${slug}".`);
+      }
       content = buildMarkdownFile(payload.data, payload.body);
       message = state.editing.isNew
         ? `Add news: ${payload.data.title}`
         : `Update news: ${payload.data.title}`;
     } else {
-      const slug = state.editing.isNew
-        ? slugify(payload.data.name)
-        : state.editing.path.split('/').pop().replace('.yaml', '');
       if (!path) path = `${CONFIG.paths.services}/${slug}.yaml`;
+      const existingItem = itemAtPath(path);
+      if (state.editing.isNew && existingItem) {
+        throw new Error(`A directory listing already exists for "${slug}". Choose a different business name.`);
+      }
       content = buildYamlFile(payload.data);
       message = state.editing.isNew
         ? `Add listing: ${payload.data.name}`
