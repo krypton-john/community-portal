@@ -1,4 +1,4 @@
-import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
+import YAML from 'js-yaml';
 
 const CONFIG = {
   owner: 'krypton-john',
