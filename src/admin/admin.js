@@ -1,4 +1,4 @@
-import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
+import YAML from 'js-yaml';
 
 const CONFIG = {
   owner: 'krypton-john',
@@ -53,7 +53,34 @@ function escapeHtml(str) {
     .replaceAll('&', '&amp;')
     .replaceAll('<', '&lt;')
     .replaceAll('>', '&gt;')
-    .replaceAll('"', '&quot;');
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function contentApiPath(path) {
+  const segments = String(path).split('/');
+  if (segments.some((segment) => !segment || segment === '.' || segment === '..')) {
+    throw new Error('Invalid repository content path.');
+  }
+  return segments.map((segment) => encodeURIComponent(segment)).join('/');
+}
+
+function normalizeWebUrl(value, label) {
+  const trimmed = value.trim();
+  if (!trimmed) return '';
+
+  let url;
+  try {
+    url = new URL(trimmed);
+  } catch {
+    throw new Error(`${label} must be a valid URL.`);
+  }
+
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+    throw new Error(`${label} must start with http:// or https://.`);
+  }
+
+  return url.href;
 }
 
 function setMessage(text, type = 'info') {
@@ -88,7 +115,7 @@ async function verifyToken() {
 
 async function listFiles(path) {
   const data = await githubFetch(
-    `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}?ref=${CONFIG.branch}`,
+    `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${contentApiPath(path)}?ref=${CONFIG.branch}`,
   );
   if (!Array.isArray(data)) return [];
   return data.filter((f) => f.type === 'file');
@@ -96,7 +123,7 @@ async function listFiles(path) {
 
 async function getFile(path) {
   const data = await githubFetch(
-    `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}?ref=${CONFIG.branch}`,
+    `/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${contentApiPath(path)}?ref=${CONFIG.branch}`,
   );
   const content = data.content ? atob(data.content.replace(/\n/g, '')) : '';
   return { ...data, decoded: content };
@@ -109,14 +136,14 @@ async function saveFile(path, content, message, sha) {
     branch: CONFIG.branch,
   };
   if (sha) body.sha = sha;
-  return githubFetch(`/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}`, {
+  return githubFetch(`/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${contentApiPath(path)}`, {
     method: 'PUT',
     body: JSON.stringify(body),
   });
 }
 
 async function deleteFile(path, sha, message) {
-  return githubFetch(`/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${path}`, {
+  return githubFetch(`/repos/${CONFIG.owner}/${CONFIG.repo}/contents/${contentApiPath(path)}`, {
     method: 'DELETE',
     body: JSON.stringify({ message, sha, branch: CONFIG.branch }),
   });
@@ -314,7 +341,7 @@ function readForm() {
         urgent: form.querySelector('[name=urgent]').checked,
         verified: form.querySelector('[name=verified]').checked,
         source: form.querySelector('[name=source]').value.trim(),
-        sourceUrl: form.querySelector('[name=sourceUrl]').value.trim(),
+        sourceUrl: normalizeWebUrl(form.querySelector('[name=sourceUrl]').value, 'Source URL'),
         expiresAt: toIso(form.querySelector('[name=expiresAt]').value),
         eventStart: toIso(form.querySelector('[name=eventStart]').value),
         eventEnd: toIso(form.querySelector('[name=eventEnd]').value),
@@ -333,22 +360,28 @@ function readForm() {
       address: form.querySelector('[name=address]').value.trim(),
       phone: form.querySelector('[name=phone]').value.trim(),
       email: form.querySelector('[name=email]').value.trim(),
-      website: form.querySelector('[name=website]').value.trim(),
+      website: normalizeWebUrl(form.querySelector('[name=website]').value, 'Website'),
       verified: form.querySelector('[name=verified]').checked,
       description: form.querySelector('[name=description]').value.trim(),
       community: 'monasterevin',
       social: {
-        facebook: form.querySelector('[name=social_facebook]').value.trim(),
-        instagram: form.querySelector('[name=social_instagram]').value.trim(),
-        twitter: form.querySelector('[name=social_twitter]').value.trim(),
-        linkedin: form.querySelector('[name=social_linkedin]').value.trim(),
+        facebook: normalizeWebUrl(form.querySelector('[name=social_facebook]').value, 'Facebook URL'),
+        instagram: normalizeWebUrl(form.querySelector('[name=social_instagram]').value, 'Instagram URL'),
+        twitter: normalizeWebUrl(form.querySelector('[name=social_twitter]').value, 'X / Twitter URL'),
+        linkedin: normalizeWebUrl(form.querySelector('[name=social_linkedin]').value, 'LinkedIn URL'),
       },
     },
   };
 }
 
 async function saveEditor() {
-  const payload = readForm();
+  let payload;
+  try {
+    payload = readForm();
+  } catch (err) {
+    setMessage(err.message, 'error');
+    return;
+  }
   if (!payload) return;
 
   if (state.tab === 'news' && !payload.data.title) {
@@ -369,7 +402,12 @@ async function saveEditor() {
     let message;
 
     if (state.tab === 'news') {
-      const slug = payload.data.permalink || slugify(payload.data.title);
+      const slug = slugify(payload.data.permalink || payload.data.title);
+      if (!slug) {
+        state.loading = false;
+        setMessage('Permalink must contain at least one letter or number.', 'error');
+        return;
+      }
       payload.data.permalink = slug;
       if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
       content = buildMarkdownFile(payload.data, payload.body);
@@ -380,6 +418,11 @@ async function saveEditor() {
       const slug = state.editing.isNew
         ? slugify(payload.data.name)
         : state.editing.path.split('/').pop().replace('.yaml', '');
+      if (!slug) {
+        state.loading = false;
+        setMessage('Business name must contain at least one letter or number.', 'error');
+        return;
+      }
       if (!path) path = `${CONFIG.paths.services}/${slug}.yaml`;
       content = buildYamlFile(payload.data);
       message = state.editing.isNew
@@ -542,7 +585,7 @@ function renderEditor() {
   return `
     <div class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
       <div class="mb-4 flex items-center justify-between">
-        <h2 class="text-lg font-semibold">${title}</h2>
+        <h2 class="text-lg font-semibold">${escapeHtml(title)}</h2>
         <button id="close-editor" class="text-sm text-slate-500 hover:text-slate-800">Close</button>
       </div>
       ${state.tab === 'news' ? renderNewsForm(e) : renderServiceForm(e)}
