@@ -164,6 +164,63 @@ function slugify(text) {
     .slice(0, 60);
 }
 
+function isValidSlug(slug) {
+  return /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug);
+}
+
+function isValidOptionalUrl(value) {
+  if (!value) return true;
+  try {
+    const url = new URL(value);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function isValidOptionalEmail(value) {
+  if (!value) return true;
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+}
+
+function validateNewsPayload(data) {
+  if (!data.title) return 'Title is required.';
+  if (!data.permalink || !isValidSlug(data.permalink)) {
+    return 'Permalink must contain lowercase letters, numbers, and hyphens only.';
+  }
+  if (!data.publishedAt) return 'Published at is required.';
+  if (!data.source) return 'Source is required.';
+  if (!isValidOptionalUrl(data.sourceUrl)) return 'Source URL must be a valid http(s) URL.';
+  return null;
+}
+
+function validateServicePayload(data) {
+  if (!data.name) return 'Business name is required.';
+  if (!data.address) return 'Address is required.';
+  if (!isValidOptionalEmail(data.email)) return 'Email must be a valid email address.';
+  if (!isValidOptionalUrl(data.website)) return 'Website must be a valid http(s) URL.';
+
+  const social = data.social ?? {};
+  const invalidSocial = Object.entries(social).find(([, value]) => !isValidOptionalUrl(value));
+  if (invalidSocial) return `${invalidSocial[0]} URL must be a valid http(s) URL.`;
+
+  return null;
+}
+
+async function newsPermalinkExists(slug, currentPath) {
+  const files = state.items.filter((item) => item.name.endsWith('.md'));
+  for (const item of files) {
+    if (item.path === currentPath) continue;
+
+    const file = await getFile(item.path);
+    const { data } = parseMarkdownFile(file.decoded);
+    const existingSlug = data.permalink || item.name.replace(/\.md$/, '');
+    if (existingSlug === slug) return true;
+  }
+
+  return false;
+}
+
 function defaultNewsData() {
   const now = new Date().toISOString();
   return {
@@ -351,27 +408,41 @@ async function saveEditor() {
   const payload = readForm();
   if (!payload) return;
 
-  if (state.tab === 'news' && !payload.data.title) {
-    setMessage('Title is required.', 'error');
-    return;
-  }
-  if (state.tab === 'services' && !payload.data.name) {
-    setMessage('Business name is required.', 'error');
-    return;
+  let path = state.editing.path;
+  let content;
+  let message;
+
+  if (state.tab === 'news') {
+    const slug = payload.data.permalink || slugify(payload.data.title);
+    payload.data.permalink = slug;
+    const validationError = validateNewsPayload(payload.data);
+    if (validationError) {
+      setMessage(validationError, 'error');
+      return;
+    }
+    if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
+  } else {
+    const validationError = validateServicePayload(payload.data);
+    if (validationError) {
+      setMessage(validationError, 'error');
+      return;
+    }
+    if (state.editing.isNew && !isValidSlug(slugify(payload.data.name))) {
+      setMessage('Business name must contain letters or numbers for the listing URL.', 'error');
+      return;
+    }
   }
 
   state.loading = true;
   render();
 
   try {
-    let path = state.editing.path;
-    let content;
-    let message;
-
     if (state.tab === 'news') {
-      const slug = payload.data.permalink || slugify(payload.data.title);
-      payload.data.permalink = slug;
-      if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
+      if (await newsPermalinkExists(payload.data.permalink, state.editing.path)) {
+        state.loading = false;
+        setMessage('A news post already uses this permalink.', 'error');
+        return;
+      }
       content = buildMarkdownFile(payload.data, payload.body);
       message = state.editing.isNew
         ? `Add news: ${payload.data.title}`
