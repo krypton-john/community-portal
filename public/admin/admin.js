@@ -1,4 +1,4 @@
-import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
+import { dump as dumpYaml, load as loadYaml } from 'https://cdn.jsdelivr.net/npm/js-yaml@5.0.0/+esm';
 
 const CONFIG = {
   owner: 'krypton-john',
@@ -125,7 +125,7 @@ async function deleteFile(path, sha, message) {
 function parseMarkdownFile(raw) {
   const match = raw.match(/^---\r?\n([\s\S]*?)\r?\n---\r?\n([\s\S]*)$/);
   if (!match) return { data: {}, body: raw.trim() };
-  const data = YAML.load(match[1]) ?? {};
+  const data = loadYaml(match[1]) ?? {};
   return { data, body: match[2].trim() };
 }
 
@@ -135,11 +135,11 @@ function buildMarkdownFile(data, body) {
     if (fm[k] === '' || fm[k] == null) delete fm[k];
   });
   if (Array.isArray(fm.tags) && fm.tags.length === 0) fm.tags = [];
-  return `---\n${YAML.dump(fm, { lineWidth: -1 })}---\n\n${body.trim()}\n`;
+  return `---\n${dumpYaml(fm, { lineWidth: -1 })}---\n\n${body.trim()}\n`;
 }
 
 function parseYamlFile(raw) {
-  return YAML.load(raw) ?? {};
+  return loadYaml(raw) ?? {};
 }
 
 function buildYamlFile(data) {
@@ -153,7 +153,7 @@ function buildYamlFile(data) {
   Object.keys(cleaned).forEach((k) => {
     if (cleaned[k] === '' || cleaned[k] == null) delete cleaned[k];
   });
-  return YAML.dump(cleaned, { lineWidth: -1 });
+  return dumpYaml(cleaned, { lineWidth: -1 });
 }
 
 function slugify(text) {
