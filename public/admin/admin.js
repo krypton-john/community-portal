@@ -399,7 +399,7 @@ async function saveEditor() {
         : `Update news: ${payload.data.title}`;
     } else {
       const slug = state.editing.isNew
-        ? slugify(payload.data.name)
+        ? normalizeSlug(payload.data.name)
         : state.editing.path.split('/').pop().replace('.yaml', '');
       if (!path) path = `${CONFIG.paths.services}/${slug}.yaml`;
       content = buildYamlFile(payload.data);
