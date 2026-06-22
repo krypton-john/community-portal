@@ -164,6 +164,12 @@ function slugify(text) {
     .slice(0, 60);
 }
 
+function normalizeSlug(text) {
+  const slug = slugify(text);
+  if (!slug) throw new Error('Enter a valid URL slug or title.');
+  return slug;
+}
+
 function defaultNewsData() {
   const now = new Date().toISOString();
   return {
@@ -351,13 +357,28 @@ async function saveEditor() {
   const payload = readForm();
   if (!payload) return;
 
-  if (state.tab === 'news' && !payload.data.title) {
-    setMessage('Title is required.', 'error');
-    return;
-  }
-  if (state.tab === 'services' && !payload.data.name) {
-    setMessage('Business name is required.', 'error');
-    return;
+  if (state.tab === 'news') {
+    if (!payload.data.title) {
+      setMessage('Title is required.', 'error');
+      return;
+    }
+    if (!payload.data.publishedAt) {
+      setMessage('Published at is required.', 'error');
+      return;
+    }
+    if (!payload.data.source) {
+      setMessage('Source is required.', 'error');
+      return;
+    }
+  } else {
+    if (!payload.data.name) {
+      setMessage('Business name is required.', 'error');
+      return;
+    }
+    if (!payload.data.address) {
+      setMessage('Address is required.', 'error');
+      return;
+    }
   }
 
   state.loading = true;
@@ -369,7 +390,7 @@ async function saveEditor() {
     let message;
 
     if (state.tab === 'news') {
-      const slug = payload.data.permalink || slugify(payload.data.title);
+      const slug = normalizeSlug(payload.data.permalink || payload.data.title);
       payload.data.permalink = slug;
       if (!path) path = `${CONFIG.paths.news}/${slug}.md`;
       content = buildMarkdownFile(payload.data, payload.body);
