@@ -9,6 +9,13 @@ const categoryEnum = z.enum([
   'community',
 ]);
 
+const httpUrl = z.string().url().refine((value) => {
+  const protocol = new URL(value).protocol;
+  return protocol === 'http:' || protocol === 'https:';
+}, 'Must be an HTTP(S) URL');
+
+const optionalHttpUrl = z.union([httpUrl, z.literal('')]).optional();
+
 const newsSchema = z.object({
   title: z.string(),
   permalink: z.string().optional(),
@@ -18,7 +25,7 @@ const newsSchema = z.object({
   urgent: z.boolean().default(false),
   verified: z.boolean().default(false),
   source: z.string(),
-  sourceUrl: z.union([z.string().url(), z.literal('')]).optional(),
+  sourceUrl: optionalHttpUrl,
   expiresAt: z.coerce.date().optional(),
   eventStart: z.coerce.date().optional(),
   eventEnd: z.coerce.date().optional(),
@@ -44,10 +51,10 @@ const serviceCategoryEnum = z.enum([
 
 const socialSchema = z
   .object({
-    facebook: z.union([z.string().url(), z.literal('')]).optional(),
-    instagram: z.union([z.string().url(), z.literal('')]).optional(),
-    twitter: z.union([z.string().url(), z.literal('')]).optional(),
-    linkedin: z.union([z.string().url(), z.literal('')]).optional(),
+    facebook: optionalHttpUrl,
+    instagram: optionalHttpUrl,
+    twitter: optionalHttpUrl,
+    linkedin: optionalHttpUrl,
   })
   .optional();
 
@@ -57,7 +64,7 @@ const serviceSchema = z.object({
   address: z.string(),
   phone: z.string().optional(),
   email: z.union([z.string().email(), z.literal('')]).optional(),
-  website: z.union([z.string().url(), z.literal('')]).optional(),
+  website: optionalHttpUrl,
   social: socialSchema,
   verified: z.boolean().default(false),
   description: z.string().optional(),

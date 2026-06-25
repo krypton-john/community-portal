@@ -294,6 +294,32 @@ function toIso(val) {
   }
 }
 
+function isHttpUrl(value) {
+  if (!value) return true;
+  try {
+    const { protocol } = new URL(value);
+    return protocol === 'http:' || protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+function getInvalidUrlMessage(payload) {
+  const fields =
+    state.tab === 'news'
+      ? [['Source URL', payload.data.sourceUrl]]
+      : [
+          ['Website', payload.data.website],
+          ['Facebook URL', payload.data.social.facebook],
+          ['Instagram URL', payload.data.social.instagram],
+          ['X / Twitter URL', payload.data.social.twitter],
+          ['LinkedIn URL', payload.data.social.linkedin],
+        ];
+
+  const invalid = fields.find(([, value]) => !isHttpUrl(value));
+  return invalid ? `${invalid[0]} must start with http:// or https://.` : null;
+}
+
 function readForm() {
   const form = document.getElementById('edit-form');
   if (!form) return null;
@@ -357,6 +383,11 @@ async function saveEditor() {
   }
   if (state.tab === 'services' && !payload.data.name) {
     setMessage('Business name is required.', 'error');
+    return;
+  }
+  const invalidUrlMessage = getInvalidUrlMessage(payload);
+  if (invalidUrlMessage) {
+    setMessage(invalidUrlMessage, 'error');
     return;
   }
 
