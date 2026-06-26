@@ -18,7 +18,10 @@ const activePosts = filterActivePosts(allPosts);
 const verifiedPosts = filterVerified(activePosts, true);
 
 const featured = verifiedPosts.find((p) => getSlug(p) === FEATURED_SLUG) ?? verifiedPosts[0];
-const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).slice(0, 3);
+const featuredSlug = featured ? getSlug(featured) : null;
+const otherNews = featuredSlug
+  ? verifiedPosts.filter((p) => getSlug(p) !== featuredSlug).slice(0, 3)
+  : [];
 ---
 
 <BaseLayout>
@@ -65,7 +68,7 @@ const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).
               </div>
               <div class="p-6 lg:col-span-5 lg:p-8">
                 <h3 class="font-display text-2xl font-bold text-community-navy sm:text-3xl">
-                  <a href={withBase(`/news/${getSlug(featured)}`)} class="hover:text-community-teal">
+                  <a href={withBase(`/news/${featuredSlug}`)} class="hover:text-community-teal">
                     {featured.data.title}
                   </a>
                 </h3>
@@ -87,7 +90,7 @@ const otherNews = verifiedPosts.filter((p) => getSlug(p) !== getSlug(featured)).
                   — covering study, wellbeing, and navigating this important time.
                 </p>
                 <a
-                  href={withBase(`/news/${getSlug(featured)}`)}
+                  href={withBase(`/news/${featuredSlug}`)}
                   class="mt-6 inline-flex items-center gap-2 font-semibold text-community-coral hover:text-community-coral-dark"
                 >
                   Read full post →
