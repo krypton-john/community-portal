@@ -1,4 +1,5 @@
 import YAML from 'https://cdn.jsdelivr.net/npm/js-yaml@4.4.0/+esm';
+import { validateEditorPayload } from './validation.js';
 
 const CONFIG = {
   owner: 'krypton-john',
@@ -351,12 +352,9 @@ async function saveEditor() {
   const payload = readForm();
   if (!payload) return;
 
-  if (state.tab === 'news' && !payload.data.title) {
-    setMessage('Title is required.', 'error');
-    return;
-  }
-  if (state.tab === 'services' && !payload.data.name) {
-    setMessage('Business name is required.', 'error');
+  const validationError = validateEditorPayload(state.tab, payload);
+  if (validationError) {
+    setMessage(validationError, 'error');
     return;
   }
 
